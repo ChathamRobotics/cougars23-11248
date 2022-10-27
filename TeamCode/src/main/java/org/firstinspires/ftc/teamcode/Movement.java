@@ -17,6 +17,11 @@ public class Movement {
     final private double initialRf;
     final private double initialRb;
 
+    public double lfPower;
+    public double lbPower;
+    public double rfPower;
+    public double rbPower;
+
     public Movement(String setType, double setMoveTime, double setDistance, AutonBot robot) {
         type = setType;
         moveTime = setMoveTime;
@@ -37,18 +42,33 @@ public class Movement {
                 expectedRf = (distance * runtime.seconds() / moveTime) + initialRf;
                 expectedLb = (distance * runtime.seconds() / moveTime) + initialLb;
                 expectedRb = (distance * runtime.seconds() / moveTime) + initialRb;
+
+                lfPower = distance / moveTime / 1000;
+                rfPower = distance / moveTime / 1000;
+                lbPower = distance / moveTime / 1000;
+                rbPower = distance / moveTime / 1000;
                 break;
             case "turn":
                 expectedLf = (distance * runtime.seconds() / moveTime) + initialLf;
                 expectedRf = (distance * runtime.seconds() / moveTime * -1) + initialRf;
                 expectedLb = (distance * runtime.seconds() / moveTime) + initialLb;
                 expectedRb = (distance * runtime.seconds() / moveTime * -1) + initialRb;
+
+                lfPower = distance / moveTime / 1000;
+                rfPower = distance / moveTime / 1000 * -1;
+                lbPower = distance / moveTime / 1000;
+                rbPower = distance / moveTime / 1000 * -1;
                 break;
             case "strafe":
                 expectedLf = (distance * runtime.seconds() / moveTime) + initialLf;
                 expectedRf = (distance * runtime.seconds() / moveTime * -1) + initialRf;
                 expectedLb = (distance * runtime.seconds() / moveTime * -1) + initialLb;
                 expectedRb = (distance * runtime.seconds() / moveTime) + initialRb;
+
+                lfPower = distance / moveTime / 1000;
+                rfPower = distance / moveTime / 1000 * -1;
+                lbPower = distance / moveTime / 1000 * -1;
+                rbPower = distance / moveTime / 1000;
                 break;
         }
     }

@@ -47,17 +47,17 @@ public class AutonBot extends BaseBot
         if (movement != null) {
             movement.frame();
 
-            leftFront.setPower(movement.distance / movement.moveTime / 1000);
-            leftBack.setPower(movement.distance / movement.moveTime / 1000);
-            rightFront.setPower(movement.distance / movement.moveTime / 1000);
-            rightBack.setPower(movement.distance / movement.moveTime / 1000);
+            leftFront.setPower(movement.lfPower);
+            leftBack.setPower(movement.lbPower);
+            rightFront.setPower(movement.rfPower);
+            rightBack.setPower(movement.rbPower);
 
-            /*
+
             leftFront.setTargetPosition((int)movement.expectedLf);
             leftBack.setTargetPosition((int)movement.expectedLb);
             rightFront.setTargetPosition((int)movement.expectedRf);
             rightBack.setTargetPosition((int)movement.expectedRb);
-             */
+
 
             if (movement.runtime.time() > movement.moveTime) {
                 movement = null;
