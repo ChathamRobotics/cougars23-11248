@@ -60,7 +60,7 @@ public class BasicDrive extends LinearOpMode
             // Calculate Power
             robot.move(gamepad1.left_stick_y * -1);
             robot.turn(gamepad1.right_stick_x);
-            robot.strafe(gamepad1.right_trigger - gamepad1.left_trigger);
+            robot.strafe(gamepad1.left_trigger - gamepad1.right_trigger);
 
             // Actually turn the motors
             robot.move();

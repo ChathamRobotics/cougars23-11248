@@ -37,12 +37,12 @@ public class AutonTest extends LinearOpMode
             {
                 if (gamepad1.cross)
                 {
-                    robot.addMovement(10, 500, "move");
+                    robot.addMovement(3, 500, "move");
                     lastInput = runtime.time();
                 }
                 if (gamepad1.triangle)
                 {
-                    robot.addMovement(10, 500, "strafe");
+                    robot.addMovement(3, 500, "strafe");
                     lastInput = runtime.time();
                 }
                 if (gamepad1.square)

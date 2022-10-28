@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 /**
  * This is NOT an opmode.
  *
@@ -41,24 +43,33 @@ public class TeleopBot extends BaseBot
     private double lbPower = 0;
     private double rfPower = 0;
     private double rbPower = 0;
-    public double basePower = 0.5;
+    private double lfTarget = 0;
+    private double lbTarget = 0;
+    private double rfTarget = 0;
+    private double rbTarget = 0;
+    public double basePower = 0.4;
+
+    private ElapsedTime runtime = new ElapsedTime();
+    private double lastTime;
 
 
     public void move() {
-        final double lfMult = 1;
-        final double lbMult = 0.998558039;
-        final double rfMult = 0.995686556;
-        final double rbMult = 0.976727786;
+        leftFront.setPower(lfPower);
+        leftBack.setPower(lbPower);
+        rightFront.setPower(rfPower);
+        rightBack.setPower(rbPower);
 
-        leftFront.setPower(lfPower * lfMult);
-        leftBack.setPower(lbPower * lbMult);
-        rightFront.setPower(rfPower * rfMult);
-        rightBack.setPower(rbPower * rbMult);
+        leftFront.setTargetPosition(leftFront.getCurrentPosition() + (int)lfTarget);
+        leftBack.setTargetPosition(leftBack.getCurrentPosition() + (int)lbTarget);
+        rightFront.setTargetPosition(rightFront.getCurrentPosition() + (int)rfTarget);
+        rightBack.setTargetPosition(rightBack.getCurrentPosition() + (int)rbTarget );
 
         lfPower = 0;
         lbPower = 0;
         rfPower = 0;
         rbPower = 0;
+
+        lastTime = runtime.milliseconds();
     }
 
     public void move(double power) {
@@ -66,6 +77,11 @@ public class TeleopBot extends BaseBot
         lbPower += power * basePower;
         rfPower += power * basePower;
         rbPower += power * basePower;
+
+        lfTarget = runtime.milliseconds() - lastTime * power;
+        lbTarget = runtime.milliseconds() - lastTime * power;
+        rfTarget = runtime.milliseconds() - lastTime * power;
+        rbTarget = runtime.milliseconds() - lastTime * power;
     }
 
     public void turn(double power) {
@@ -73,6 +89,11 @@ public class TeleopBot extends BaseBot
         lbPower += power * basePower;
         rfPower -= power * basePower;
         rbPower -= power * basePower;
+
+        lfTarget = runtime.milliseconds() - lastTime * power;
+        lbTarget = runtime.milliseconds() - lastTime * power;
+        rfTarget = (runtime.milliseconds() - lastTime * power) * -1;
+        rbTarget = (runtime.milliseconds() - lastTime * power) * -1;
     }
 
     public void strafe(double power) {
@@ -80,6 +101,11 @@ public class TeleopBot extends BaseBot
         lbPower += power * basePower;
         rfPower += power * basePower;
         rbPower -= power * basePower;
+
+        lfTarget = (runtime.milliseconds() - lastTime * power) * -1;
+        lbTarget = runtime.milliseconds() - lastTime * power;
+        rfTarget = runtime.milliseconds() - lastTime * power;
+        rbTarget = (runtime.milliseconds() - lastTime * power) * -1;
     }
 
 }

@@ -100,7 +100,7 @@ public class BaseBot
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
         // Set all motors to zero power
