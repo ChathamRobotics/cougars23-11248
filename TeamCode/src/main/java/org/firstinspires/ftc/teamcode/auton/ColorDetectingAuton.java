@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.AutonBot;
 import org.firstinspires.ftc.teamcode.Constants;
 
-@Autonomous(name = "Basic Auton")
-public class BasicAuton extends LinearOpMode {
+@Autonomous(name = "Color Detecting Auton")
+public class ColorDetectingAuton extends LinearOpMode {
     AutonBot robot = new AutonBot();
 
     @Override
@@ -22,8 +22,14 @@ public class BasicAuton extends LinearOpMode {
         //robot.command(3, 3, "turn");
         //robot.command(3, 3, "move");
 
-        robot.command(4, 27, "move", this);
-        //robot.command(2, 30, "turn");
+        robot.command(4, 16, "move", this);
+        robot.command(1, 30, "turn", this);
+        robot.command(1, 2, "move", this);
 
+        while (opModeIsActive()) {
+            robot.move();
+
+
+        }
     }
 }

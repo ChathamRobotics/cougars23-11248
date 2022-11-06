@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.TeleopBot;
 
-@TeleOp(name="Drive Test")
+//@TeleOp(name="Drive Test")
 public class DriveTest extends LinearOpMode
 {
     private final TeleopBot robot = new TeleopBot();

@@ -49,7 +49,7 @@ public class TeleopBot extends BaseBot
     private double rbTarget = 0;
     public double basePower = 0.4;
 
-    private ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime();
     private double lastTime;
 
 
@@ -59,10 +59,13 @@ public class TeleopBot extends BaseBot
         rightFront.setPower(rfPower);
         rightBack.setPower(rbPower);
 
+        /*
         leftFront.setTargetPosition(leftFront.getCurrentPosition() + (int)lfTarget);
         leftBack.setTargetPosition(leftBack.getCurrentPosition() + (int)lbTarget);
         rightFront.setTargetPosition(rightFront.getCurrentPosition() + (int)rfTarget);
         rightBack.setTargetPosition(rightBack.getCurrentPosition() + (int)rbTarget );
+         */
+
 
         lfPower = 0;
         lbPower = 0;

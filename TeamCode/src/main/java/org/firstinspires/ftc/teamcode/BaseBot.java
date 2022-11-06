@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
@@ -65,12 +66,14 @@ public class BaseBot
      * By defining them as variables in this class, we can use them throughout our project,
      * with autocomplete, without having to know the string device names
      */
-    public DcMotor  leftFront           = null;
-    public DcMotor  leftBack            = null;
-    public DcMotor  rightFront          = null;
-    public DcMotor  rightBack           = null;
-    public DcMotor  clawLift            = null;
-    public Servo    claw                = null;
+    public DcMotor      leftFront           = null;
+    public DcMotor      leftBack            = null;
+    public DcMotor      rightFront          = null;
+    public DcMotor      rightBack           = null;
+    public DcMotor      clawLift            = null;
+    public Servo        claw                = null;
+    public ColorSensor  colorSensorL        = null;
+    public ColorSensor  colorSensorR        = null;
 
     /**
      * Initialize all the hardware, and set static settings like motor direction and running with encoders
@@ -86,13 +89,16 @@ public class BaseBot
 
         claw                = hwMap.get(Servo.class, "claw");
 
+        colorSensorL        = hwMap.get(ColorSensor.class, "colorSensorL");
+        colorSensorR        = hwMap.get(ColorSensor.class, "colorSensorR");
+
 
         // Initialize Motor Direction
         leftFront.setDirection(Direction.FORWARD);
-        leftBack.setDirection(Direction.FORWARD);
-        rightFront.setDirection(Direction.REVERSE);
+        leftBack.setDirection(Direction.REVERSE);
+        rightFront.setDirection(Direction.FORWARD);
         rightBack.setDirection(Direction.FORWARD);
-        clawLift.setDirection(Direction.REVERSE);
+        clawLift.setDirection(Direction.FORWARD);
 
 
         // Make sure motors brake on power 0
@@ -125,6 +131,5 @@ public class BaseBot
 
 
         // Intake and Duck Spinner don't have encoders
-
     }
 }
