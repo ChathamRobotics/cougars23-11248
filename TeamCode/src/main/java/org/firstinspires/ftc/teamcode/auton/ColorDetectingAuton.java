@@ -22,14 +22,24 @@ public class ColorDetectingAuton extends LinearOpMode {
         //robot.command(3, 3, "turn");
         //robot.command(3, 3, "move");
 
+        /*
         robot.command(4, 16, "move", this);
         robot.command(1, 30, "turn", this);
         robot.command(1, 2, "move", this);
+         */
 
         while (opModeIsActive()) {
-            robot.move();
-
-
+            if (robot.colorSensorL.red() < 200 && robot.colorSensorL.green() > 200 && robot.colorSensorL.blue() < 200) {
+                //color = "green"; - zone 2
+                telemetry.addData("color", "green");
+            } else if (robot.colorSensorL.red() > 200 && robot.colorSensorL.green() > 200 && robot.colorSensorL.blue() < 200) {
+                //color = "orange"; - zone 3
+                telemetry.addData("color", "orange");
+            } else if (robot.colorSensorL.red() < 200 && robot.colorSensorL.green() < 200 && robot.colorSensorL.blue() > 200) {
+                //color = "purple"; - zone 1
+                telemetry.addData("color", "purple");
+            }
+            telemetry.update();
         }
     }
 }

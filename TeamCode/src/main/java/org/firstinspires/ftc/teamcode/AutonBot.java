@@ -107,10 +107,11 @@ public class AutonBot extends BaseBot
         final ArrayList<String> commands = new ArrayList<>();
         Collections.addAll(commands, "move", "turn", "strafe", "delay", "moveClaw", "claw");
         if (!commands.contains(command)) return;
-        movement = (new Movement(command, time, distance, 0.4, this));
+        movement = new Movement(command, time, distance, 0.4, this);
         movement.init(this);
         while(movement != null) {
             move();
+
             robot.telemetry.addData("CS L", "(" + colorSensorL.red() + ", " + colorSensorL.green() + ", " + colorSensorL.blue() + ")");
             robot.telemetry.addData("CS R", "(" + colorSensorR.red() + ", " + colorSensorR.green() + ", " + colorSensorR.blue() + ")");
             String color = "no color detected";

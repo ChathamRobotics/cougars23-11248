@@ -76,10 +76,10 @@ public class Movement {
         }
     }
     public void frame(AutonBot robot) {
-        lfPower = Math.max(Math.min(Math.pow(expectedLf - robot.leftFront.getCurrentPosition(), 1d/3d) / 14d, maxPower), maxPower * -1);
-        rfPower = Math.max(Math.min(Math.pow(expectedRf - robot.rightFront.getCurrentPosition(), 1d/3d) / 14d, maxPower), maxPower * -1);
-        lbPower = Math.max(Math.min(Math.pow(expectedLb - robot.leftBack.getCurrentPosition(), 1d/3d) / 14d, maxPower), maxPower * -1);
-        rbPower = Math.max(Math.min(Math.pow(expectedRb - robot.rightBack.getCurrentPosition(), 1d/3d) / 14d, maxPower), maxPower * -1);
+        lfPower = Math.max(Math.min(Math.pow(expectedLf - robot.leftFront.getCurrentPosition(), 1d/3d) / 25d, maxPower), maxPower * -1);
+        rfPower = Math.max(Math.min(Math.pow(expectedRf - robot.rightFront.getCurrentPosition(), 1d/3d) / 25d, maxPower), maxPower * -1);
+        lbPower = Math.max(Math.min(Math.pow(expectedLb - robot.leftBack.getCurrentPosition(), 1d/3d) / 25d, maxPower), maxPower * -1);
+        rbPower = Math.max(Math.min(Math.pow(expectedRb - robot.rightBack.getCurrentPosition(), 1d/3d) / 25d, maxPower), maxPower * -1);
 
         frameCount += 1;
     }

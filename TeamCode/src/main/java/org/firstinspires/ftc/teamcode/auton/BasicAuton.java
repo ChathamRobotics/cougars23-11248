@@ -22,7 +22,7 @@ public class BasicAuton extends LinearOpMode {
         //robot.command(3, 3, "turn");
         //robot.command(3, 3, "move");
 
-        robot.command(4, 27, "move", this);
+        robot.command(10, 20, "move", this);
         //robot.command(2, 30, "turn");
 
     }

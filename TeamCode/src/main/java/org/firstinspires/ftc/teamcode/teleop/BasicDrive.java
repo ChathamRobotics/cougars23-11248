@@ -13,7 +13,7 @@ public class BasicDrive extends LinearOpMode
     private final TeleopBot robot = new TeleopBot();
     private final ElapsedTime runtime = new ElapsedTime();
     private double lastPowerChangeTime;
-    private double clawLiftPower = 0.5d;
+    private double clawLiftPower = 1;
 
     @Override
     public void runOpMode()
@@ -63,10 +63,15 @@ public class BasicDrive extends LinearOpMode
                 }
             }
             if (gamepad2.left_bumper) {
-                robot.claw.setPosition(.29);
+                robot.claw.setPosition(.20);
             }
             else if (gamepad2.right_bumper) {
-                robot.claw.setPosition(.47);
+                robot.claw.setPosition(.80);
+            }
+            if (gamepad2.cross) {
+                robot.clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            } else {
+                robot.clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             }
 
             // Calculate Power
