@@ -25,6 +25,7 @@ public class BasicDrive extends LinearOpMode
         telemetry.speak("Robot inishiated");
 
         waitForStart();
+        robot.clawLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         while(opModeIsActive())
         {
@@ -41,16 +42,6 @@ public class BasicDrive extends LinearOpMode
                     robot.basePower = Math.min(1, robot.basePower + 0.1);
                     lastPowerChangeTime = runtime.time();
                 }
-                if (gamepad1.dpad_left)
-                {
-                    robot.claw.setPosition(robot.claw.getPosition() + 0.01);
-                    lastPowerChangeTime = runtime.time();
-                }
-                else if (gamepad1.dpad_right)
-                {
-                    robot.claw.setPosition(robot.claw.getPosition() - 0.01);
-                    lastPowerChangeTime = runtime.time();
-                }
                 if (gamepad2.dpad_down)
                 {
                     clawLiftPower = Math.max(0, clawLiftPower - 0.1);
@@ -63,10 +54,12 @@ public class BasicDrive extends LinearOpMode
                 }
             }
             if (gamepad2.left_bumper) {
-                robot.claw.setPosition(.20);
+                robot.clawL.setPosition(0);
+                robot.clawR.setPosition(1);
             }
             else if (gamepad2.right_bumper) {
-                robot.claw.setPosition(.80);
+                robot.clawL.setPosition(1);
+                robot.clawR.setPosition(0);
             }
             if (gamepad2.cross) {
                 robot.clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -86,14 +79,19 @@ public class BasicDrive extends LinearOpMode
                 robot.clawLift.setPower(gamepad2.left_stick_y * clawLiftPower * -1);
             } else {
                 robot.clawLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.clawLift.setPower(clawLiftPower);
+                if (robot.clawLift.getCurrentPosition() < 0) {
+                    robot.clawLift.setPower(clawLiftPower * -1);
+                } else {
+                    robot.clawLift.setPower(clawLiftPower);
+                }
                 robot.clawLift.setTargetPosition(0);
             }
             // Display the current motor name, encoder position, and power
             telemetry.addData("Status", "Running");
             telemetry.addData("Power", robot.basePower);
             telemetry.addData("Claw Lift Power", clawLiftPower);
-            telemetry.addData("Claw Servo Position", robot.claw.getPosition());
+            telemetry.addData("ClawL Servo Position", robot.clawL.getPosition());
+            telemetry.addData("ClawR Servo Position", robot.clawR.getPosition());
             telemetry.addData("Claw Lift Position", robot.clawLift.getCurrentPosition());
             telemetry.addData("A", gamepad2.left_stick_y * clawLiftPower * -1);
             telemetry.update();

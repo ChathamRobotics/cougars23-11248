@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.TeleopBot;
 
-//@TeleOp(name="Drive Test")
+@TeleOp(name="Drive Test", group="Testing")
 public class DriveTest extends LinearOpMode
 {
     private final TeleopBot robot = new TeleopBot();
@@ -49,12 +49,34 @@ public class DriveTest extends LinearOpMode
                     clawLiftPower = Math.min(1, clawLiftPower + 0.1);
                     lastPowerChangeTime = runtime.time();
                 }
+                if (gamepad2.square)
+                {
+                    robot.clawL.setPosition(robot.clawL.getPosition() + 0.01);
+                    lastPowerChangeTime = runtime.time();
+                }
+                else if (gamepad2.triangle)
+                {
+                    robot.clawL.setPosition(robot.clawL.getPosition() - 0.01);
+                    lastPowerChangeTime = runtime.time();
+                }
+                if (gamepad2.cross)
+                {
+                    robot.clawR.setPosition(robot.clawR.getPosition() + 0.01);
+                    lastPowerChangeTime = runtime.time();
+                }
+                else if (gamepad2.circle)
+                {
+                    robot.clawR.setPosition(robot.clawR.getPosition() - 0.01);
+                    lastPowerChangeTime = runtime.time();
+                }
             }
             if (gamepad2.left_bumper) {
-                robot.claw.setPosition(0);
+                robot.clawL.setPosition(1);
+                robot.clawR.setPosition(0);
             }
             else if (gamepad2.right_bumper) {
-                robot.claw.setPosition(1);
+                robot.clawL.setPosition(0);
+                robot.clawR.setPosition(1);
             }
 
             // Calculate Power
@@ -70,6 +92,8 @@ public class DriveTest extends LinearOpMode
             telemetry.addData("Status", "Running");
             telemetry.addData("Power", robot.basePower);
             telemetry.addData("Claw Lift Power", clawLiftPower);
+            telemetry.addData("Claw L", robot.clawL.getPosition());
+            telemetry.addData("Claw R", robot.clawR.getPosition());
             telemetry.addData("Left Stick Y", gamepad1.left_stick_y);
             telemetry.addData("lf Motor Encoder", robot.leftFront.getCurrentPosition());
             telemetry.addData("rf Motor Encoder", robot.rightFront.getCurrentPosition());

@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Constants;
  * NOTE: This does not respect the motor directions set in OurRobot, all motors are set to run forwards
  */
 
-@TeleOp(name="Auton Test")
+@TeleOp(name="Auton Test", group="Testing")
 public class AutonTest extends LinearOpMode
 {
     private final AutonBot robot = new AutonBot();

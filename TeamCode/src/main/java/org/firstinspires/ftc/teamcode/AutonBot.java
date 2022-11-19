@@ -33,6 +33,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvWebcam;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +51,8 @@ import java.util.Set;
  * */
 public class AutonBot extends BaseBot
 {
+    public OpenCvWebcam webcam;
+
     public double basePower = 0.5;
 
     public Movement movement;
@@ -54,6 +60,10 @@ public class AutonBot extends BaseBot
     @Override
     public void init(HardwareMap hwMap) {
         super.init(hwMap);
+        int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
+        webcam.setMillisecondsPermissionTimeout(2500);
+
         leftFront.setTargetPosition(0);
         leftBack.setTargetPosition(0);
         rightFront.setTargetPosition(0);
@@ -100,10 +110,10 @@ public class AutonBot extends BaseBot
      * - For turn, distance is in degrees <br/>
      * - For delay, distance is not used <br/>
      * - For claw, distance is either 1 for open or 0 for closed <br/>
-     * - For moveClaw, distance is 0 for ground, 1 for max height, -1 for short junction, -2 for medium junction, and -3 for tall junction <br/>
+     * - For moveClaw, distance is 0 for ground, 1 for max height, -1 for short junction, -2 for medium junction, and -3 for tall junction (1900) <br/>
      * - For switch,
      */
-    public void command(double time, double distance, String command, LinearOpMode robot) {
+    public void command(double time, double distance, String command, LinearOpMode opMode) {
         final ArrayList<String> commands = new ArrayList<>();
         Collections.addAll(commands, "move", "turn", "strafe", "delay", "moveClaw", "claw");
         if (!commands.contains(command)) return;
@@ -112,39 +122,28 @@ public class AutonBot extends BaseBot
         while(movement != null) {
             move();
 
-            robot.telemetry.addData("CS L", "(" + colorSensorL.red() + ", " + colorSensorL.green() + ", " + colorSensorL.blue() + ")");
-            robot.telemetry.addData("CS R", "(" + colorSensorR.red() + ", " + colorSensorR.green() + ", " + colorSensorR.blue() + ")");
-            String color = "no color detected";
-            if (colorSensorR.red() < 200 && colorSensorR.green() > 200 && colorSensorR.blue() < 200) {
-                color = "green";
-            } else if (colorSensorR.red() > 200 && colorSensorR.green() > 200 && colorSensorR.blue() < 200) {
-                color = "orange";
-            } else if (colorSensorR.red() < 200 && colorSensorR.green() < 200 && colorSensorR.blue() > 200) {
-                color = "purple";
-            }
-            robot.telemetry.addData("color", color);
-            robot.telemetry.addData("enc counts per in", Constants.ENCODER_COUNTS_PER_IN);
-            robot.telemetry.addData("lf Motor Encoder", leftFront.getCurrentPosition());
-            robot.telemetry.addData("rf Motor Encoder", rightFront.getCurrentPosition());
-            robot.telemetry.addData("lb Motor Encoder", leftBack.getCurrentPosition());
-            robot.telemetry.addData("rb Motor Encoder", rightBack.getCurrentPosition());
+            opMode.telemetry.addData("enc counts per in", Constants.ENCODER_COUNTS_PER_IN);
+            opMode.telemetry.addData("lf Motor Encoder", leftFront.getCurrentPosition());
+            opMode.telemetry.addData("rf Motor Encoder", rightFront.getCurrentPosition());
+            opMode.telemetry.addData("lb Motor Encoder", leftBack.getCurrentPosition());
+            opMode.telemetry.addData("rb Motor Encoder", rightBack.getCurrentPosition());
             if (movement != null && movement.runtime != null) {
-                robot.telemetry.addData("lf Expected Pos", movement.expectedLf);
-                robot.telemetry.addData("rf Expected Pos", movement.expectedRf);
-                robot.telemetry.addData("lb Expected Pos", movement.expectedLb);
-                robot.telemetry.addData("rb Expected Pos", movement.expectedRb);
-                robot.telemetry.addData("lf Power", movement.lfPower);
-                robot.telemetry.addData("rf Power", movement.rfPower);
-                robot.telemetry.addData("lb Power", movement.lbPower);
-                robot.telemetry.addData("rb Power", movement.rbPower);
-                robot.telemetry.addData("movement type", movement.type);
-                robot.telemetry.addData("movement progress", movement.runtime.time());
-                robot.telemetry.addData("movement time", movement.moveTime);
-                robot.telemetry.addData("max power", movement.maxPower);
-                robot.telemetry.addData("calc power (lf)", Math.max(Math.min(Math.pow(movement.expectedLf - leftFront.getCurrentPosition(), 1d/3d) / 14d, movement.maxPower), movement.maxPower * -1));
-                robot.telemetry.addData("fps", movement.frameCount / movement.runtime.time());
+                opMode.telemetry.addData("lf Expected Pos", movement.expectedLf);
+                opMode.telemetry.addData("rf Expected Pos", movement.expectedRf);
+                opMode.telemetry.addData("lb Expected Pos", movement.expectedLb);
+                opMode.telemetry.addData("rb Expected Pos", movement.expectedRb);
+                opMode.telemetry.addData("lf Power", movement.lfPower);
+                opMode.telemetry.addData("rf Power", movement.rfPower);
+                opMode.telemetry.addData("lb Power", movement.lbPower);
+                opMode.telemetry.addData("rb Power", movement.rbPower);
+                opMode.telemetry.addData("movement type", movement.type);
+                opMode.telemetry.addData("movement progress", movement.runtime.time());
+                opMode.telemetry.addData("movement time", movement.moveTime);
+                opMode.telemetry.addData("max power", movement.maxPower);
+                opMode.telemetry.addData("calc power (lf)", Math.max(Math.min(Math.pow(movement.expectedLf - leftFront.getCurrentPosition(), 1d/3d) / 14d, movement.maxPower), movement.maxPower * -1));
+                opMode.telemetry.addData("fps", movement.frameCount / movement.runtime.time());
             }
-            robot.telemetry.update();
+            opMode.telemetry.update();
         }
     }
 }

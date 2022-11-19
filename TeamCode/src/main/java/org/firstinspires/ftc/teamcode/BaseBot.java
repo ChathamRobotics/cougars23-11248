@@ -71,7 +71,8 @@ public class BaseBot
     public DcMotor      rightFront          = null;
     public DcMotor      rightBack           = null;
     public DcMotor      clawLift            = null;
-    public Servo        claw                = null;
+    public Servo        clawL               = null;
+    public Servo        clawR               = null;
     public ColorSensor  colorSensorL        = null;
     public ColorSensor  colorSensorR        = null;
 
@@ -87,7 +88,8 @@ public class BaseBot
         rightBack           = hwMap.get(DcMotor.class, "rightBack");
         clawLift            = hwMap.get(DcMotor.class, "clawLift");
 
-        claw                = hwMap.get(Servo.class, "claw");
+        clawL               = hwMap.get(Servo.class, "clawL");
+        clawR               = hwMap.get(Servo.class, "clawR");
 
         colorSensorL        = hwMap.get(ColorSensor.class, "colorSensorL");
         colorSensorR        = hwMap.get(ColorSensor.class, "colorSensorR");
@@ -130,6 +132,8 @@ public class BaseBot
         rightBack.setMode(RunMode.RUN_USING_ENCODER);
 
 
-        // Intake and Duck Spinner don't have encoders
+        // Set min and max for servos
+        clawL.scaleRange(0.08, 0.38);
+        clawR.scaleRange(0.43, 0.74);
     }
 }

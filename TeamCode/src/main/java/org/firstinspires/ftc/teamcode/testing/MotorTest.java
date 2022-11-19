@@ -17,7 +17,7 @@ import java.util.List;
  * Move the left joystick up and down to run the motor
  * NOTE: This does not respect the motor directions set in OurRobot, all motors are set to run forwards
  */
-@TeleOp(name="Motor Test")
+@TeleOp(name="Motor Test", group="Testing")
 public class MotorTest extends LinearOpMode
 {
     private double power = 0.5;
