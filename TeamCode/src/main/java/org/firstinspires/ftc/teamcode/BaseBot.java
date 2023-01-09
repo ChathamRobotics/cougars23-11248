@@ -71,6 +71,8 @@ public class BaseBot
     public DcMotor      rightFront          = null;
     public DcMotor      rightBack           = null;
     public DcMotor      clawLift            = null;
+    public DcMotor      clawIntake          = null;
+    public DcMotor      reverseSpool        = null;
     public Servo        clawL               = null;
     public Servo        clawR               = null;
     public ColorSensor  colorSensorL        = null;
@@ -87,20 +89,24 @@ public class BaseBot
         rightFront          = hwMap.get(DcMotor.class, "rightFront");
         rightBack           = hwMap.get(DcMotor.class, "rightBack");
         clawLift            = hwMap.get(DcMotor.class, "clawLift");
+        clawIntake          = hwMap.get(DcMotor.class, "clawIntake");
+        reverseSpool        = hwMap.get(DcMotor.class, "reverseSpool");
 
         clawL               = hwMap.get(Servo.class, "clawL");
         clawR               = hwMap.get(Servo.class, "clawR");
 
-        colorSensorL        = hwMap.get(ColorSensor.class, "colorSensorL");
-        colorSensorR        = hwMap.get(ColorSensor.class, "colorSensorR");
+        //colorSensorL        = hwMap.get(ColorSensor.class, "colorSensorL");
+        //colorSensorR        = hwMap.get(ColorSensor.class, "colorSensorR");
 
 
         // Initialize Motor Direction
         leftFront.setDirection(Direction.FORWARD);
-        leftBack.setDirection(Direction.REVERSE);
+        leftBack.setDirection(Direction.FORWARD);
         rightFront.setDirection(Direction.FORWARD);
-        rightBack.setDirection(Direction.FORWARD);
-        clawLift.setDirection(Direction.FORWARD);
+        rightBack.setDirection(Direction.REVERSE);
+        clawLift.setDirection(Direction.REVERSE);
+        clawIntake.setDirection(Direction.FORWARD);
+        reverseSpool.setDirection(Direction.FORWARD);
 
 
         // Make sure motors brake on power 0
@@ -109,6 +115,8 @@ public class BaseBot
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        clawIntake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
         // Set all motors to zero power
@@ -116,6 +124,9 @@ public class BaseBot
         leftBack.setPower(0);
         rightFront.setPower(0);
         rightBack.setPower(0);
+        clawLift.setPower(0);
+        clawIntake.setPower(0);
+        reverseSpool.setPower(0);
 
 
         // Reset all encoders
@@ -123,6 +134,9 @@ public class BaseBot
         leftBack.setMode(RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(RunMode.STOP_AND_RESET_ENCODER);
+        clawLift.setMode(RunMode.STOP_AND_RESET_ENCODER);
+        clawIntake.setMode(RunMode.STOP_AND_RESET_ENCODER);
+        reverseSpool.setMode(RunMode.STOP_AND_RESET_ENCODER);
 
 
         // Set motors to run with encoder
@@ -130,6 +144,9 @@ public class BaseBot
         leftBack.setMode(RunMode.RUN_USING_ENCODER);
         rightFront.setMode(RunMode.RUN_USING_ENCODER);
         rightBack.setMode(RunMode.RUN_USING_ENCODER);
+        clawLift.setMode(RunMode.RUN_USING_ENCODER);
+        clawIntake.setMode(RunMode.RUN_USING_ENCODER);
+        reverseSpool.setMode(RunMode.RUN_USING_ENCODER);
 
 
         // Set min and max for servos

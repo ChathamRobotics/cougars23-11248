@@ -1,13 +1,12 @@
-package org.firstinspires.ftc.teamcode.auton;
+package org.firstinspires.ftc.teamcode.archive;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.AutonBot;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Autonomous(name = "QR Code Detecting Auton")
+//@Autonomous(name = "QR Code Detecting Auton")
 public class QRCodeDetectingAuton extends LinearOpMode {
     public AutonBot robot = new AutonBot();
     public ReadQRCodePipeline pipeline = new ReadQRCodePipeline();

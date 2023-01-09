@@ -30,22 +30,24 @@ public class AutonTest extends LinearOpMode
 
         waitForStart();
 
+        robot.command(5, 75, "strafe", this);
+
         while(opModeIsActive())
         {
             if (gamepad1.cross)
             {
-                robot.command(3, 10, "move", this);
+                robot.command(3, 1, "claw", this);
             }
             if (gamepad1.triangle)
             {
-                robot.command(3, 10, "strafe", this);
+                robot.command(3, 0, "claw", this);
             }
             if (gamepad1.square)
             {
-                robot.command(10, 10, "turn", this);
+                robot.command(5, 1, "moveClaw", this);
             }
             if (gamepad1.circle) {
-                robot.command(3, 0, "delay", this);
+                robot.command(5, -90, "turn", this);
             }
         }
     }

@@ -63,9 +63,16 @@ public class BasicDrive extends LinearOpMode
             }
             if (gamepad2.cross) {
                 robot.clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                robot.reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             } else {
                 robot.clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                robot.reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             }
+
+            if (gamepad2.triangle) {
+                robot.clawLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+
 
             // Calculate Power
             robot.move(gamepad1.left_stick_y * -1);
@@ -74,18 +81,65 @@ public class BasicDrive extends LinearOpMode
 
             // Actually turn the motors
             robot.move();
-            if (!(gamepad2.left_stick_y * clawLiftPower * -1 < 0) || (!(robot.clawLift.getCurrentPosition() <= 100) && gamepad2.left_stick_y != 0)) {
-                robot.clawLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.clawLift.setPower(gamepad2.left_stick_y * clawLiftPower * -1);
-            } else {
-                robot.clawLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                if (robot.clawLift.getCurrentPosition() < 0) {
-                    robot.clawLift.setPower(clawLiftPower * -1);
+            robot.clawLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.reverseSpool.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            int CLAW_LIFT_MAX = 3250;
+            double REVERSE_SPOOL_MULTI = 0.77;
+            if ((gamepad2.left_stick_y * clawLiftPower * -1 > 0 && robot.clawLift.getCurrentPosition() < CLAW_LIFT_MAX - 50) || (gamepad2.left_stick_y * clawLiftPower * -1 < 0 && robot.clawLift.getCurrentPosition() > 100) || (!(robot.clawLift.getCurrentPosition() <= 100) && gamepad2.left_stick_y != 0 && !(robot.clawLift.getCurrentPosition() >= CLAW_LIFT_MAX - 50))) {
+                if (gamepad2.left_stick_y * -1 < 0) {
+                    robot.clawLift.setPower(0);
+                } else if (gamepad2.left_stick_y != 0) {
+                    robot.clawLift.setPower(gamepad2.left_stick_y * clawLiftPower * -1);
+                    robot.clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                    telemetry.addData("currently moving", "clawLift");
                 } else {
-                    robot.clawLift.setPower(clawLiftPower);
+                    robot.clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                }
+            } else if (robot.clawLift.getCurrentPosition() >= 100 && robot.clawLift.getCurrentPosition() <= CLAW_LIFT_MAX - 50) {
+                robot.clawLift.setPower(0);
+            } else if(robot.clawLift.getCurrentPosition() < 100) {
+                if (robot.clawLift.getCurrentPosition() < 0) {
+                    robot.clawLift.setPower(clawLiftPower * 0.1);
+                } else {
+                    robot.clawLift.setPower(clawLiftPower * 0.1 * -1);
                 }
                 robot.clawLift.setTargetPosition(0);
+                robot.clawLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            } else if(robot.clawLift.getCurrentPosition() > CLAW_LIFT_MAX - 50) {
+                if (robot.clawLift.getCurrentPosition() < CLAW_LIFT_MAX) {
+                    robot.clawLift.setPower(clawLiftPower * 0.1);
+                } else {
+                    robot.clawLift.setPower(clawLiftPower * 0.1 * -1);
+                }
+                robot.clawLift.setTargetPosition(CLAW_LIFT_MAX);
+                robot.clawLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
+            if (gamepad2.left_stick_y * -1 < 0) {
+                robot.reverseSpool.setPower(clawLiftPower * clawLiftPower * REVERSE_SPOOL_MULTI);
+                telemetry.addData("currently moving", "reverseSpool");
+            } else if (gamepad2.left_stick_y != 0) {
+                robot.reverseSpool.setPower(0);
+                robot.reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            } else {
+                robot.reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            }
+            /*
+            if (robot.reverseSpool.getCurrentPosition() < robot.clawLift.getCurrentPosition()) {
+                robot.reverseSpool.setPower(clawLiftPower * clawLiftPower * REVERSE_SPOOL_MULTI);
+            } else {
+                robot.reverseSpool.setPower(clawLiftPower * clawLiftPower * REVERSE_SPOOL_MULTI * -1);
+            }
+            double bias = 0;
+            if (gamepad2.left_stick_y * -1 > 0) bias += 50;
+            if (gamepad2.left_stick_y * -1 < 0) bias -= 50;
+            if (robot.clawLift.getCurrentPosition() < 100 || robot.clawLift.getCurrentPosition() > CLAW_LIFT_MAX - 100) bias *= 0.6;
+            if (robot.clawLift.getCurrentPosition() < 50 || robot.clawLift.getCurrentPosition() > CLAW_LIFT_MAX - 50) bias *= 0.2;
+             */
+           // robot.reverseSpool.setTargetPosition((int)(robot.clawLift.getCurrentPosition() * REVERSE_SPOOL_MULTI + bias));
+
+            robot.clawIntake.setPower(gamepad2.right_stick_y * 0.2 * -1);
+
+
             // Display the current motor name, encoder position, and power
             telemetry.addData("Status", "Running");
             telemetry.addData("Power", robot.basePower);
@@ -93,6 +147,8 @@ public class BasicDrive extends LinearOpMode
             telemetry.addData("ClawL Servo Position", robot.clawL.getPosition());
             telemetry.addData("ClawR Servo Position", robot.clawR.getPosition());
             telemetry.addData("Claw Lift Position", robot.clawLift.getCurrentPosition());
+            telemetry.addData("Reverse Spool Position", robot.reverseSpool.getCurrentPosition());
+            telemetry.addData("Reverse Spool Target Position", robot.reverseSpool.getTargetPosition());
             telemetry.addData("A", gamepad2.left_stick_y * clawLiftPower * -1);
             telemetry.update();
         }

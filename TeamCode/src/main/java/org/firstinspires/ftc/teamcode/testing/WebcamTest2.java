@@ -23,6 +23,7 @@ package org.firstinspires.ftc.teamcode.testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Mat;
@@ -36,10 +37,15 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 @TeleOp(name = "Webcam Test 2", group = "Testing")
 public class WebcamTest2 extends LinearOpMode
 {
     OpenCvWebcam webcam;
+    ElapsedTime runtime = new ElapsedTime();
+    private double lastInput = 0;
 
     @Override
     public void runOpMode()
@@ -132,38 +138,21 @@ public class WebcamTest2 extends LinearOpMode
             telemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
             telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
             telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
-            telemetry.addData("qr code", pipeline.getColor()[0] + ", " + pipeline.getColor()[1] + ", " + pipeline.getColor()[2]);
+            telemetry.addData("Pixel colors (PGO)", "[" + pipeline.getPixelColors()[0] + ", " + pipeline.getPixelColors()[1] + ", " + pipeline.getPixelColors()[2] + "]");
+            telemetry.addData("Saturation Margin", pipeline.satMargin);
+            telemetry.addData("Runtime seconds", runtime.seconds());
+            telemetry.addData("lastInput", lastInput);
             telemetry.update();
 
-            /*
-             * NOTE: stopping the stream from the camera early (before the end of the OpMode
-             * when it will be automatically stopped for you) *IS* supported. The "if" statement
-             * below will stop streaming from the camera when the "A" button on gamepad 1 is pressed.
-             */
-            if(gamepad1.a)
-            {
-                /*
-                 * IMPORTANT NOTE: calling stopStreaming() will indeed stop the stream of images
-                 * from the camera (and, by extension, stop calling your vision pipeline). HOWEVER,
-                 * if the reason you wish to stop the stream early is to switch use of the camera
-                 * over to, say, Vuforia or TFOD, you will also need to call closeCameraDevice()
-                 * (commented out below), because according to the Android Camera API documentation:
-                 *         "Your application should only have one Camera object active at a time for
-                 *          a particular hardware camera."
-                 *
-                 * NB: calling closeCameraDevice() will internally call stopStreaming() if applicable,
-                 * but it doesn't hurt to call it anyway, if for no other reason than clarity.
-                 *
-                 * NB2: if you are stopping the camera stream to simply save some processing power
-                 * (or battery power) for a short while when you do not need your vision pipeline,
-                 * it is recommended to NOT call closeCameraDevice() as you will then need to re-open
-                 * it the next time you wish to activate your vision pipeline, which can take a bit of
-                 * time. Of course, this comment is irrelevant in light of the use case described in
-                 * the above "important note".
-                 */
-                webcam.stopStreaming();
-                //webcam.closeCameraDevice();
+            if (gamepad1.dpad_up && lastInput + 0.1 < runtime.seconds()) {
+                pipeline.satMargin += 0.01;
+                lastInput = runtime.seconds();
             }
+            if (gamepad1.dpad_down && lastInput + 0.1 < runtime.seconds()) {
+                pipeline.satMargin -= 0.01;
+                lastInput = runtime.seconds();
+            }
+
 
             /*
              * For the purposes of this sample, throttle ourselves to 10Hz loop to avoid burning
@@ -192,9 +181,10 @@ public class WebcamTest2 extends LinearOpMode
     class SamplePipeline extends OpenCvPipeline
     {
         boolean viewportPaused;
+        private static final int COLOR_RANGE = 25;
 
-        private volatile int color = 0;
-        private volatile double[] test;
+        private volatile double[] pixelColors = {0,0,0};
+        public double satMargin = 0.3;
         /*
          * NOTE: if you wish to use additional Mat objects in your processing pipeline, it is
          * highly recommended to declare them here as instance variables and re-use them for
@@ -207,28 +197,92 @@ public class WebcamTest2 extends LinearOpMode
         @Override
         public Mat processFrame(Mat input)
         {
+            double middlePixelHue = hueFromRGB(input.get(input.rows() / 2, input.cols() / 2));
 
+            int orangePixels = 0;
+            int greenPixels = 0;
+            int purplePixels = 0;
 
-//            Imgproc.rectangle(
-//                    input,
-//                    new Point(
-//                            input.cols()/4f,
-//                            input.rows()/4f),
-//                    new Point(
-//                            input.cols()*(3f/4f),
-//                            input.rows()*(3f/4f)),
-//                    new Scalar(0, 255, 0), 4);
+            for (int i = 0; i < input.rows(); i+=10) {
+                for (int j = 0; j < input.cols(); j+=10) {
+                    double[] pixelRGB = input.get(i, j);
+                    if (isGray(pixelRGB)) continue;
+                    double pixelHue = hueFromRGB(pixelRGB);
+                    String detectedColor = colorFromHue(pixelHue);
+                    switch (detectedColor) {
+                        case "orange":
+                            orangePixels += 1;
+                            break;
+                        case "green":
+                            greenPixels += 1;
+                            break;
+                        case "purple":
+                            purplePixels += 1;
+                            break;
+                    }
+                }
+            }
 
-            test = input.get((int) (input.cols()/2f), (int) (input.rows()/2f));
+            Imgproc.putText(input, "Hue: " + middlePixelHue, new Point(100, 50), Imgproc.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,0,0), 3);
+            Imgproc.putText(input, "Color detected: " + colorFromHue(middlePixelHue), new Point(100, 100), Imgproc.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,0,0), 3);
             Imgproc.circle(input, new Point(input.cols()/2f, input.rows()/2f), 5, new Scalar(0,255,0), 3);
-            Imgproc.putText(input, test[0] + ", " + test[1] + ", " + test[2], new Point(0, 100), Imgproc.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,0,0), 3);
+            Imgproc.putText(input, "orange: " + orangePixels + " green: " + greenPixels + " purple: " + purplePixels, new Point(0, 150), Imgproc.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255,0,0), 3);
 
+            pixelColors[0] = purplePixels;
+            pixelColors[1] = greenPixels;
+            pixelColors[2] = orangePixels;
             return input;
         }
 
-        public double[] getColor() {
-            return test;
+        /**
+         * Get the number of pixels of each color
+         *
+         * @return number of pixels in each color in PGO
+         */
+        public double[] getPixelColors() {
+            return pixelColors;
         }
+
+        private double hueFromRGB(double[] rgbPixel) {
+            double hue = 0;
+            double r = rgbPixel[0] / 255;
+            double g = rgbPixel[1] / 255;
+            double b = rgbPixel[2] / 255;
+
+            double cmax = Math.max(r, Math.max(g, b));
+            double cmin = Math.min(r, Math.min(g, b));
+            double delta = cmax - cmin;
+
+            if (cmax == cmin) hue = 0;
+            if (cmax == r) hue = 60 * (((g - b)/delta) % 6);
+            if (cmax == g) hue = 60 * ((b - r)/delta + 2);
+            if (cmax == b) hue = 60 * ((r - g)/delta + 4);
+            if (hue < 0) hue += 360;
+
+            return hue;
+        }
+
+        private String colorFromHue(double hue) {
+            if (hue - 300 < COLOR_RANGE && hue - 300 > -COLOR_RANGE) return "purple";
+            if (hue - 125 < COLOR_RANGE && hue - 125 > -COLOR_RANGE) return "green";
+            if (hue - 40 < COLOR_RANGE && hue - 40 > -COLOR_RANGE) return "orange";
+            return "none";
+        }
+
+        private boolean isGray(double[] rgbPixel) {
+            double r = rgbPixel[0] / 255;
+            double g = rgbPixel[1] / 255;
+            double b = rgbPixel[2] / 255;
+
+            double cmax = Math.max(r, Math.max(g, b));
+            double cmin = Math.min(r, Math.min(g, b));
+            double delta = cmax - cmin;
+
+            if (cmax == 0) return true;
+            if (delta / cmax < satMargin) return true;
+            return false;
+        }
+
 
         @Override
         public void onViewportTapped()

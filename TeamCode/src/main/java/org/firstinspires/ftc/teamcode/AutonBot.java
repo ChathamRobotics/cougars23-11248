@@ -60,9 +60,9 @@ public class AutonBot extends BaseBot
     @Override
     public void init(HardwareMap hwMap) {
         super.init(hwMap);
-        int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
-        webcam.setMillisecondsPermissionTimeout(2500);
+        //int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
+        //webcam = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
+        //webcam.setMillisecondsPermissionTimeout(2500);
 
         leftFront.setTargetPosition(0);
         leftBack.setTargetPosition(0);
@@ -74,6 +74,7 @@ public class AutonBot extends BaseBot
         rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        clawLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
     public void move() {
         if (movement != null) {
@@ -89,6 +90,19 @@ public class AutonBot extends BaseBot
             leftBack.setTargetPosition((int)movement.expectedLb);
             rightFront.setTargetPosition((int)movement.expectedRf);
             rightBack.setTargetPosition((int)movement.expectedRb);
+
+            clawLift.setPower(movement.clawLiftPower);
+            clawLift.setTargetPosition((int)movement.expectedClawLift);
+
+
+            clawL.setPosition(movement.expectedClaw);
+            clawR.setPosition(1 - movement.expectedClaw);
+
+            leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            clawLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
             if (movement.runtime != null && movement.runtime.time() > movement.moveTime) {
@@ -110,7 +124,7 @@ public class AutonBot extends BaseBot
      * - For turn, distance is in degrees <br/>
      * - For delay, distance is not used <br/>
      * - For claw, distance is either 1 for open or 0 for closed <br/>
-     * - For moveClaw, distance is 0 for ground, 1 for max height, -1 for short junction, -2 for medium junction, and -3 for tall junction (1900) <br/>
+     * - For moveClaw, distance is 0 for ground, 1 for max height, -1 for short junction, -2 for medium junction, and -3 for tall junction (1900)          <br/>
      * - For switch,
      */
     public void command(double time, double distance, String command, LinearOpMode opMode) {
@@ -128,14 +142,19 @@ public class AutonBot extends BaseBot
             opMode.telemetry.addData("lb Motor Encoder", leftBack.getCurrentPosition());
             opMode.telemetry.addData("rb Motor Encoder", rightBack.getCurrentPosition());
             if (movement != null && movement.runtime != null) {
+                opMode.telemetry.addData("encDistance", movement.encDistance);
                 opMode.telemetry.addData("lf Expected Pos", movement.expectedLf);
                 opMode.telemetry.addData("rf Expected Pos", movement.expectedRf);
                 opMode.telemetry.addData("lb Expected Pos", movement.expectedLb);
                 opMode.telemetry.addData("rb Expected Pos", movement.expectedRb);
+                opMode.telemetry.addData("claw lift Expected Pos", movement.expectedClawLift);
+
                 opMode.telemetry.addData("lf Power", movement.lfPower);
                 opMode.telemetry.addData("rf Power", movement.rfPower);
                 opMode.telemetry.addData("lb Power", movement.lbPower);
                 opMode.telemetry.addData("rb Power", movement.rbPower);
+                opMode.telemetry.addData("claw lift Power", movement.clawLiftPower);
+
                 opMode.telemetry.addData("movement type", movement.type);
                 opMode.telemetry.addData("movement progress", movement.runtime.time());
                 opMode.telemetry.addData("movement time", movement.moveTime);

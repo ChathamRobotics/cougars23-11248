@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.AutonBot;
 import org.firstinspires.ftc.teamcode.Constants;
 
-@Autonomous(name = "Basic Auton")
+@Autonomous(name = "Basic Auton", group = "Basic")
 public class BasicAuton extends LinearOpMode {
     AutonBot robot = new AutonBot();
 

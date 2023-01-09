@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.testing;
+package org.firstinspires.ftc.teamcode.archive;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -36,7 +36,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@TeleOp(name = "Webcam Test", group = "Testing")
+//@TeleOp(name = "Webcam Test", group = "Testing")
 public class WebcamTest extends LinearOpMode
 {
     OpenCvWebcam webcam;
@@ -100,7 +100,7 @@ public class WebcamTest extends LinearOpMode
                  * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
                  * away from the user.
                  */
-                webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+                webcam.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -223,20 +223,9 @@ public class WebcamTest extends LinearOpMode
             /*
              * Draw a simple box around the middle 1/2 of the entire frame
              */
-            Imgproc.rectangle(
-                    input,
-                    new Point(
-                            input.cols()/4f,
-                            input.rows()/4f),
-                    new Point(
-                            input.cols()*(3f/4f),
-                            input.rows()*(3f/4f)),
-                    new Scalar(0, 255, 0), 4);
             Imgproc.putText(input, qrCodeOutput, new Point(100, 100), Imgproc.FONT_HERSHEY_SIMPLEX, 2, new Scalar(255,0,0), 3);
-            Imgproc.putText(input, qrCodeDetector.detectAndDecodeCurved(input), new Point(100, 300), Imgproc.FONT_HERSHEY_SIMPLEX, 2, new Scalar(255,0,0), 3);
             //Imgproc.circle(input, new Point(input.cols()/2f, input.rows()/2f), 20, new Scalar(0,0,0));
 
-            //qrCodeDetector.detect(input, input);
             return input;
         }
 
