@@ -100,10 +100,10 @@ public class TeleopBot extends BaseBot
     }
 
     public void strafe(double power) {
-        lfPower -= power * basePower;
-        lbPower += power * basePower;
-        rfPower += power * basePower;
-        rbPower -= power * basePower;
+        lfPower += power * basePower;
+        lbPower -= power * basePower;
+        rfPower -= power * basePower;
+        rbPower += power * basePower;
 
         lfTarget = (runtime.milliseconds() - lastTime * power) * -1;
         lbTarget = runtime.milliseconds() - lastTime * power;

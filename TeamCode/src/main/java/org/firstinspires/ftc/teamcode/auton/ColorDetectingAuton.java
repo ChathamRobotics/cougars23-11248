@@ -175,11 +175,11 @@ public class ColorDetectingAuton extends LinearOpMode {
         switch (maxPixels) {
             case 0:
                 //purple
-                robot.command(3, -35, "strafe", this);
+                robot.command(3, -40, "strafe", this);
                 break;
             case 2:
                 //orange
-                robot.command(3, 35, "strafe", this);
+                robot.command(3, 40, "strafe", this);
                 break;
         }
     }

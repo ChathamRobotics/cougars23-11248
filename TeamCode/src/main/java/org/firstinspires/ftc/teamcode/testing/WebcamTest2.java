@@ -264,8 +264,8 @@ public class WebcamTest2 extends LinearOpMode
 
         private String colorFromHue(double hue) {
             if (hue - 300 < COLOR_RANGE && hue - 300 > -COLOR_RANGE) return "purple";
-            if (hue - 125 < COLOR_RANGE && hue - 125 > -COLOR_RANGE) return "green";
-            if (hue - 40 < COLOR_RANGE && hue - 40 > -COLOR_RANGE) return "orange";
+            if (hue - 90 < COLOR_RANGE && hue - 90 > -COLOR_RANGE) return "green";
+            if (hue - 180 < COLOR_RANGE && hue - 180 > -COLOR_RANGE) return "orange";
             return "none";
         }
 

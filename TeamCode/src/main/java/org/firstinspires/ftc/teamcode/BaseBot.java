@@ -71,6 +71,7 @@ public class BaseBot
     public DcMotor      rightFront          = null;
     public DcMotor      rightBack           = null;
     public DcMotor      clawLift            = null;
+    public DcMotor      clawLift2           = null;
     public DcMotor      clawIntake          = null;
     public DcMotor      reverseSpool        = null;
     public Servo        clawL               = null;
@@ -89,11 +90,13 @@ public class BaseBot
         rightFront          = hwMap.get(DcMotor.class, "rightFront");
         rightBack           = hwMap.get(DcMotor.class, "rightBack");
         clawLift            = hwMap.get(DcMotor.class, "clawLift");
+        clawLift2           = hwMap.get(DcMotor.class, "clawLift2");
         clawIntake          = hwMap.get(DcMotor.class, "clawIntake");
         reverseSpool        = hwMap.get(DcMotor.class, "reverseSpool");
 
         clawL               = hwMap.get(Servo.class, "clawL");
         clawR               = hwMap.get(Servo.class, "clawR");
+
 
         //colorSensorL        = hwMap.get(ColorSensor.class, "colorSensorL");
         //colorSensorR        = hwMap.get(ColorSensor.class, "colorSensorR");
@@ -105,6 +108,7 @@ public class BaseBot
         rightFront.setDirection(Direction.FORWARD);
         rightBack.setDirection(Direction.REVERSE);
         clawLift.setDirection(Direction.REVERSE);
+        clawLift2.setDirection(Direction.FORWARD);
         clawIntake.setDirection(Direction.FORWARD);
         reverseSpool.setDirection(Direction.FORWARD);
 
@@ -115,6 +119,7 @@ public class BaseBot
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        clawLift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         clawIntake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
@@ -125,6 +130,7 @@ public class BaseBot
         rightFront.setPower(0);
         rightBack.setPower(0);
         clawLift.setPower(0);
+        clawLift2.setPower(0);
         clawIntake.setPower(0);
         reverseSpool.setPower(0);
 
@@ -135,6 +141,7 @@ public class BaseBot
         rightFront.setMode(RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(RunMode.STOP_AND_RESET_ENCODER);
         clawLift.setMode(RunMode.STOP_AND_RESET_ENCODER);
+        clawLift2.setMode(RunMode.STOP_AND_RESET_ENCODER);
         clawIntake.setMode(RunMode.STOP_AND_RESET_ENCODER);
         reverseSpool.setMode(RunMode.STOP_AND_RESET_ENCODER);
 
@@ -145,6 +152,7 @@ public class BaseBot
         rightFront.setMode(RunMode.RUN_USING_ENCODER);
         rightBack.setMode(RunMode.RUN_USING_ENCODER);
         clawLift.setMode(RunMode.RUN_USING_ENCODER);
+        clawLift2.setMode(RunMode.RUN_USING_ENCODER);
         clawIntake.setMode(RunMode.RUN_USING_ENCODER);
         reverseSpool.setMode(RunMode.RUN_USING_ENCODER);
 
