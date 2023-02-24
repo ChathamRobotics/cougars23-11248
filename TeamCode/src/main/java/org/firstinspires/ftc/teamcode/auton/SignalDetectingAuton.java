@@ -53,7 +53,7 @@ import org.firstinspires.ftc.teamcode.AutonBot;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Signal Detecting Auton", group = "Sensor")
+//@Autonomous(name = "Signal Detecting Auton", group = "Sensor")
 public class SignalDetectingAuton extends LinearOpMode {
 
     /*
@@ -111,7 +111,7 @@ public class SignalDetectingAuton extends LinearOpMode {
         // first.
         initVuforia();
         initTfod();
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, this);
 
         /**
          * Activate TensorFlow Object Detection before we wait for the start command.
@@ -173,22 +173,22 @@ public class SignalDetectingAuton extends LinearOpMode {
                 case "3":
                     telemetry.addData("zone", "3");
                     telemetry.update();
-                    robot.command(5, 10, "move", this);
-                    robot.command(5, 105, "turn", this);
-                    robot.command(5, 10, "move", this);
+                    robot.command(5, 10, "move");
+                    robot.command(5, 105, "turn");
+                    robot.command(5, 10, "move");
                     break;
                 case "2":
                     telemetry.addData("zone", "2");
                     telemetry.update();
-                    robot.command(10, 20, "move", this);
+                    robot.command(10, 20, "move");
                     break;
                 case "1":
                 default:
                     telemetry.addData("zone", "1 / default");
                     telemetry.update();
-                    robot.command(5, 10, "move", this);
-                    robot.command(5, -105, "turn", this);
-                    robot.command(5, 10, "move", this);
+                    robot.command(5, 10, "move");
+                    robot.command(5, -105, "turn");
+                    robot.command(5, 10, "move");
                     break;
             }
             sleep(5000);

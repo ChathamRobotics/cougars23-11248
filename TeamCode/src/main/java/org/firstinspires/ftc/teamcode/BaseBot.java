@@ -29,12 +29,14 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 
 /**
  * This is NOT an opmode.
@@ -42,7 +44,7 @@ import com.qualcomm.robotcore.hardware.Servo;
  * This class is used to define all the hardware for our 2021-2022 robot.
  *
  * */
-public class BaseBot
+public abstract class BaseBot
 {
     /** Encoder counts per motor revolution, usually found in the motor's datasheet */
     public static final double COUNTS_PER_MOTOR_REV = 28;    // REV Ultraplanetary
@@ -78,6 +80,8 @@ public class BaseBot
     public Servo        clawR               = null;
     public ColorSensor  colorSensorL        = null;
     public ColorSensor  colorSensorR        = null;
+    //public UltrasonicSensor ultrasonic      = null;
+
 
     /**
      * Initialize all the hardware, and set static settings like motor direction and running with encoders
@@ -98,6 +102,8 @@ public class BaseBot
         clawR               = hwMap.get(Servo.class, "clawR");
 
 
+        //ultrasonic          = hwMap.get(UltrasonicSensor.class, "ultrasonic");
+
         //colorSensorL        = hwMap.get(ColorSensor.class, "colorSensorL");
         //colorSensorR        = hwMap.get(ColorSensor.class, "colorSensorR");
 
@@ -109,7 +115,7 @@ public class BaseBot
         rightBack.setDirection(Direction.REVERSE);
         clawLift.setDirection(Direction.REVERSE);
         clawLift2.setDirection(Direction.FORWARD);
-        clawIntake.setDirection(Direction.FORWARD);
+        clawIntake.setDirection(Direction.REVERSE);
         reverseSpool.setDirection(Direction.FORWARD);
 
 
@@ -157,8 +163,9 @@ public class BaseBot
         reverseSpool.setMode(RunMode.RUN_USING_ENCODER);
 
 
-        // Set min and max for servos
-        clawL.scaleRange(0.08, 0.38);
-        clawR.scaleRange(0.43, 0.74);
+        // Set min and max for servosw
+        clawL.scaleRange(0.09, 0.29);
+        clawR.scaleRange(0.52, 0.7);
     }
+
 }

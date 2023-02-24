@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.util.Log;
+import static org.firstinspires.ftc.teamcode.Constants.CLAW_LIFT_MAX;
+import static org.firstinspires.ftc.teamcode.Constants.INTAKE_BOTTOM;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.Constants;
 
 public class Movement {
     public String type;
@@ -21,12 +21,14 @@ public class Movement {
     public double expectedRb;
     public double expectedClawLift;
     public double expectedClaw;
+    public double expectedClawIntake;
 
     public double lfPower;
     public double lbPower;
     public double rfPower;
     public double rbPower;
     public double clawLiftPower;
+    public double clawIntakePower;
 
     /**
     * Class for a movement action <br/>
@@ -34,10 +36,11 @@ public class Movement {
     * - For move and strafe, distance is in inches <br/>
     * - For turn, distance is in degrees <br/>
     * - For delay, distance is not used <br/>
-    * - For claw, distance is either 1 for open or 0 for closed <br/>
-    * - For moveClaw, distance is 0 for ground, 1 for max height, -1 for short junction, -2 for medium junction, and -3 for tall junction <br/>
-     */
-    public Movement(String setType, double setMoveTime, double setDistance, double setMaxPower, AutonBot robot) {
+    * - For claw, distance is either 0 for open or 1 for closed <br/>
+    * - For moveClaw, distance is from 0 (min) to 1 (max) <br/>
+    * - For clawIntake, distance is 0 for ground, 1 for all the way up<br/>
+    */
+    public Movement(String setType, double setMoveTime, double setDistance, double setMaxPower) {
         type = setType;
         moveTime = setMoveTime;
         distance = setDistance;
@@ -53,87 +56,47 @@ public class Movement {
 
         double initialClawLift = robot.clawLift.getCurrentPosition();
         double initialClaw = robot.clawL.getPosition();
+        double initialClawIntake = robot.clawIntake.getCurrentPosition();
 
         runtime = new ElapsedTime();
 
+        expectedLf = initialLf;
+        expectedRf = initialRf;
+        expectedLb = initialLb;
+        expectedRb = initialRb;
+
+        expectedClawLift = initialClawLift;
+        expectedClaw = initialClaw;
+        expectedClawIntake = initialClawIntake;
         switch (type) {
             case "move":
                 expectedLf = initialLf + encDistance;
                 expectedRf = initialRf + encDistance;
                 expectedLb = initialLb + encDistance;
                 expectedRb = initialRb + encDistance;
-
-                expectedClawLift = initialClawLift;
-                expectedClaw = initialClaw;
                 break;
             case "turn":
-                expectedLf = initialLf + (encDistance * 12.5 / 90 * 1.5);
-                expectedRf = initialRf - (encDistance * 12.5 / 90 * 1.5);
-                expectedLb = initialLb + (encDistance * 12.5 / 90 * 1.5);
-                expectedRb = initialRb - (encDistance * 12.5 / 90 * 1.5);
-
-                expectedClawLift = initialClawLift;
-                expectedClaw = initialClaw;
+                expectedLf = initialLf + (encDistance * 0.24);
+                expectedRf = initialRf - (encDistance * 0.24);
+                expectedLb = initialLb + (encDistance * 0.24);
+                expectedRb = initialRb - (encDistance * 0.24);
                 break;
             case "strafe":
-                Log.d("Movement", initialLf - (encDistance * 2) + "");
-                Log.d("Movement", initialRf - (encDistance * 2) + "");
-                Log.d("Movement", initialLb - (encDistance * 2) + "");
-                Log.d("Movement", initialRb - (encDistance * 2) + "");
-
-                expectedLf = initialLf + (encDistance * 2);
-                expectedRf = initialRf - (encDistance * 2);
-                expectedLb = initialLb - (encDistance * 2);
-                expectedRb = initialRb + (encDistance * 2);
-
-                expectedClawLift = initialClawLift;
-                expectedClaw = initialClaw;
+                expectedLf = initialLf + (encDistance * 12/11);
+                expectedRf = initialRf - (encDistance * 12/11);
+                expectedLb = initialLb - (encDistance * 12/11);
+                expectedRb = initialRb + (encDistance * 12/11);
                 break;
             case "delay":
-                expectedLf = initialLf;
-                expectedRf = initialRf;
-                expectedLb = initialLb;
-                expectedRb = initialRb;
-
-                expectedClawLift = initialClawLift;
-                expectedClaw = initialClaw;
                 break;
             case "claw":
-                expectedLf = initialLf;
-                expectedRf = initialRf;
-                expectedLb = initialLb;
-                expectedRb = initialRb;
-
-                expectedClawLift = initialClawLift;
                 expectedClaw = distance;
                 break;
             case "moveClaw":
-                expectedLf = initialLf;
-                expectedRf = initialRf;
-                expectedLb = initialLb;
-                expectedRb = initialRb;
-
-                switch ((int)distance) {
-                    case -3:
-                        expectedClawLift = 1800;
-                        break;
-                    case -2:
-                        expectedClawLift = 1000;
-                        break;
-                    case -1:
-                        expectedClawLift = 500;
-                        break;
-                    case 0:
-                    case 1:
-                        expectedClawLift = distance * 1800;
-                        break;
-                    default:
-                        expectedClawLift = initialClawLift;
-
-
-                }
-                expectedClawLift = distance * 1800;
-                expectedClaw = initialClaw;
+                expectedClawLift = distance * CLAW_LIFT_MAX;
+                break;
+            case "clawIntake":
+                expectedClawIntake = INTAKE_BOTTOM - distance * INTAKE_BOTTOM;
                 break;
         }
     }
@@ -151,7 +114,8 @@ public class Movement {
         rbPower = Math.max(Math.min(expectedRb - robot.rightBack.getCurrentPosition() / 25d / 25d, maxPower), maxPower * -1);
 
 
-        clawLiftPower = Math.max(Math.min(Math.pow(expectedRb - robot.clawLift.getCurrentPosition(), 1d/3d) / 25d, maxPower), maxPower * -1);
+        clawLiftPower = Math.abs(Math.max(Math.min(expectedClawLift - robot.clawLift.getCurrentPosition() / 25d / 25d, maxPower), maxPower * -1));
+        clawIntakePower = Math.max(Math.min(expectedClawIntake - robot.clawIntake.getCurrentPosition() / 25d / 25d, maxPower), maxPower * -1);
         frameCount += 1;
     }
 }

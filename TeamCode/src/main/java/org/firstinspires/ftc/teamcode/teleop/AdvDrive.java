@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import static org.firstinspires.ftc.teamcode.Constants.CLAW_LIFT_MAX;
+import static org.firstinspires.ftc.teamcode.Constants.INTAKE_BOTTOM;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,13 +16,12 @@ public class AdvDrive extends LinearOpMode
     private final TeleopBot robot = new TeleopBot();
     private final ElapsedTime runtime = new ElapsedTime();
     private double lastPowerChangeTime;
+    private boolean boost = false;
     private double clawLiftPower = 1;
     private double clawIntakePower = 0.3;
     private int runningMacro = 0;
     private double macroTime = 0;
-    final int CLAW_LIFT_MAX = 1775;
     final double REVERSE_SPOOL_MULTI = 0.77;
-    final int INTAKE_BOTTOM = -950;
 
     @Override
     public void runOpMode()
@@ -36,7 +38,7 @@ public class AdvDrive extends LinearOpMode
 
         while(opModeIsActive())
         {
-            // Adjust Power
+            // Fine Adjust Power
             if (runtime.time()  > lastPowerChangeTime + 0.5)
             {
                 if (gamepad1.dpad_down)
@@ -59,29 +61,50 @@ public class AdvDrive extends LinearOpMode
                     clawLiftPower = Math.min(1, clawLiftPower + 0.1);
                     lastPowerChangeTime = runtime.time();
                 }
-                if (gamepad2.dpad_left) {
-                    clawIntakePower = Math.min(1, clawIntakePower + 0.1);
-                    lastPowerChangeTime = runtime.time();
-                } else if (gamepad2.dpad_right) {
-                    clawIntakePower = Math.min(1, clawIntakePower - 0.1);
-                    lastPowerChangeTime = runtime.time();
-                }
             }
+
+            // Quick Adjust Power
+            if (gamepad1.y) {
+                robot.basePower = 0.8;
+            } else if (gamepad1.a) {
+                robot.basePower = 0.4;
+            }
+            if (gamepad1.left_bumper) {
+                robot.basePower = 0.9;
+                boost = true;
+            } else if (gamepad1.right_bumper) {
+                robot.basePower = 0.2;
+                boost = true;
+            } else if (!gamepad1.right_bumper && !gamepad1.left_bumper && boost) {
+                robot.basePower = 0.4;
+                boost = false;
+            }
+
+
+            // Claw
             if (gamepad2.left_bumper) {
                 // open
-                robot.clawL.setPosition(0);
-                robot.clawR.setPosition(1);
-            }
-            else if (gamepad2.right_bumper) {
-                // close
                 robot.clawL.setPosition(1);
                 robot.clawR.setPosition(0);
             }
-            else if (gamepad2.left_trigger > 0) {
-                // halfway
-                robot.clawL.setPosition(0.5);
-                robot.clawR.setPosition(0.5);
+            else if (gamepad2.right_bumper) {
+                // close
+                robot.clawL.setPosition(0);
+                robot.clawR.setPosition(1);
             }
+            else if (gamepad2.right_trigger > 0) {
+                // slightly more closed than halfway
+                robot.clawL.setPosition(0.25);
+                robot.clawR.setPosition(0.75);
+            }
+
+            // Clawlift Slowdown & Brake
+            if (gamepad2.left_trigger > 0) {
+                clawIntakePower = 0.075;
+            } else {
+                clawIntakePower = 0.3;
+            }
+
             if (gamepad2.cross) {
                 robot.clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 robot.clawLift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -92,9 +115,18 @@ public class AdvDrive extends LinearOpMode
                 robot.reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             }
 
-            if (gamepad2.triangle) {
+            // ClawLift reset encoders
+            if (gamepad2.triangle) { // AKA Y
                 robot.clawLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.clawLift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.reverseSpool.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.clawLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.clawLift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.reverseSpool.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            if (gamepad2.circle) { // AKA B
+                robot.clawIntake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.clawIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
 
             // Macros
@@ -122,7 +154,7 @@ public class AdvDrive extends LinearOpMode
                         telemetry.addData("test", Math.PI * (double)robot.clawIntake.getCurrentPosition() / (double)CLAW_LIFT_MAX);
                         robot.clawLift.setPower(0);
                         robot.clawLift2.setPower(0);
-                        robot.reverseSpool.setPower(1);
+                        robot.reverseSpool.setPower(-1);
                         robot.clawIntake.setPower((-0.8 * Math.sin(Math.PI * robot.clawIntake.getCurrentPosition() / CLAW_LIFT_MAX)) - 0.2);
                         robot.clawLift.setTargetPosition(0);
                         robot.clawLift2.setTargetPosition(0);
@@ -180,11 +212,15 @@ public class AdvDrive extends LinearOpMode
             // Calculate Power
             robot.move(gamepad1.left_stick_y * -1);
             robot.turn(gamepad1.right_stick_x);
-            robot.strafe(gamepad1.left_stick_x + gamepad1.left_trigger - gamepad1.right_trigger);
+            double leftY = gamepad1.left_stick_x;
+            if (Math.abs(leftY) < 0.8) leftY = 0;
+            robot.strafe(leftY + gamepad1.right_trigger - gamepad1.left_trigger);
             //robot.strafe(gamepad1.left_trigger - gamepad1.right_trigger);
 
             // Actually turn the motors
             robot.move();
+
+
             robot.clawLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.clawLift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.reverseSpool.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -231,7 +267,7 @@ public class AdvDrive extends LinearOpMode
                 robot.clawLift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
             if (gamepad2.left_stick_y * -1 < 0) {
-                robot.reverseSpool.setPower(gamepad2.left_stick_y * clawLiftPower * REVERSE_SPOOL_MULTI);
+                robot.reverseSpool.setPower(gamepad2.left_stick_y * clawLiftPower * -1);
                 //robot.clawLift.setPower(gamepad2.left_stick_y * clawLiftPower * REVERSE_SPOOL_MULTI * -1);
                 //robot.clawLift2.setPower(gamepad2.left_stick_y * clawLiftPower * REVERSE_SPOOL_MULTI * -1);
                 telemetry.addData("currently moving", "reverseSpool");
@@ -244,9 +280,9 @@ public class AdvDrive extends LinearOpMode
             }
             /*
             if (robot.reverseSpool.getCurrentPosition() < robot.clawLift.getCurrentPosition()) {
-                robot.reverseSpool.setPower(clawLiftPower * clawLiftPower * REVERSE_SPOOL_MULTI);
-            } else {
                 robot.reverseSpool.setPower(clawLiftPower * clawLiftPower * REVERSE_SPOOL_MULTI * -1);
+            } else {
+                robot.reverseSpool.setPower(clawLiftPower * clawLiftPower * REVERSE_SPOOL_MULTI);
             }
             double bias = 0;
             if (gamepad2.left_stick_y * -1 > 0) bias += 50;
@@ -256,11 +292,26 @@ public class AdvDrive extends LinearOpMode
              */
            // robot.reverseSpool.setTargetPosition((int)(robot.clawLift.getCurrentPosition() * REVERSE_SPOOL_MULTI + bias));
 
-            robot.clawIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.clawIntake.setPower(gamepad2.right_stick_y * clawIntakePower * -1);
+            if ((gamepad2.right_stick_y * -1 < 0 && robot.clawIntake.getCurrentPosition() > INTAKE_BOTTOM) || (gamepad2.right_stick_y * -1 > 0 && robot.clawIntake.getCurrentPosition() < 0)) {
+                robot.clawIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                if (Math.abs(gamepad2.right_stick_y) > 0.99) {
+                    robot.clawIntake.setPower(gamepad2.right_stick_y * clawIntakePower * - 1);
+                }
+                else {
+                    robot.clawIntake.setPower(gamepad2.right_stick_y * clawIntakePower * - 1 * 0.2);
+                }
+            } else if (robot.clawIntake.getCurrentPosition() > 0) {
+                robot.clawIntake.setPower(-0.05);
+                robot.clawIntake.setTargetPosition(0);
+                robot.clawIntake.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            } else {
+                robot.clawIntake.setPower(0);
+            }
 
             // Display the current motor name, encoder position, and power
             telemetry.addData("Status", "Running");
+            //telemetry.addData("Ultrasonic", robot.ultrasonic.getUltrasonicLevel());
             telemetry.addData("Power", robot.basePower);
             telemetry.addData("Claw Lift Power", clawLiftPower);
             telemetry.addData("ClawL Servo Position", robot.clawL.getPosition());
@@ -270,8 +321,9 @@ public class AdvDrive extends LinearOpMode
             telemetry.addData("Reverse Spool Position", robot.reverseSpool.getCurrentPosition());
             telemetry.addData("Reverse Spool Target Position", robot.reverseSpool.getTargetPosition());
             telemetry.addData("Reverse Spool Power", robot.reverseSpool.getPower());
-            telemetry.addData("A", gamepad2.left_stick_y * clawLiftPower * -1);
+            telemetry.addData("A", gamepad2.right_stick_y);
             telemetry.addData("Claw Intake Pos", robot.clawIntake.getCurrentPosition());
+            telemetry.addData("Claw Intake Power", clawIntakePower);
             telemetry.addData("Claw Intake Speed", robot.clawIntake.getPower());
             telemetry.addData("Macro", runningMacro);
             telemetry.update();

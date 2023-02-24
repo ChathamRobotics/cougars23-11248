@@ -33,15 +33,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This is NOT an opmode.
@@ -51,14 +46,15 @@ import java.util.Set;
  * */
 public class AutonBot extends BaseBot
 {
+    private LinearOpMode opMode;
     public OpenCvWebcam webcam;
 
     public double basePower = 0.5;
 
     public Movement movement;
 
-    @Override
-    public void init(HardwareMap hwMap) {
+    public void init(HardwareMap hwMap, LinearOpMode setOpMode) {
+        opMode = setOpMode;
         super.init(hwMap);
         //int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
         //webcam = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
@@ -69,12 +65,21 @@ public class AutonBot extends BaseBot
         rightFront.setTargetPosition(0);
         rightBack.setTargetPosition(0);
 
+        clawLift.setTargetPosition(0);
+        clawLift2.setTargetPosition(0);
+        clawIntake.setTargetPosition(0);
+
         leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         clawLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        clawLift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        clawIntake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        clawLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        clawLift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        clawIntake.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     public void move() {
         if (movement != null) {
@@ -91,9 +96,27 @@ public class AutonBot extends BaseBot
             rightFront.setTargetPosition((int)movement.expectedRf);
             rightBack.setTargetPosition((int)movement.expectedRb);
 
-            clawLift.setPower(movement.clawLiftPower);
-            clawLift.setTargetPosition((int)movement.expectedClawLift);
+            if (clawLift.getCurrentPosition() < movement.expectedClawLift && !isWithin(clawLift.getCurrentPosition(), movement.expectedClawLift, 10)) {
+                clawLift.setPower(movement.clawLiftPower);
+                clawLift2.setPower(movement.clawLiftPower);
+                clawLift.setTargetPosition((int)movement.expectedClawLift);
+                clawLift2.setTargetPosition((int)movement.expectedClawLift);
+                reverseSpool.setPower(0);
+                reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                clawLift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            } else if (clawLift.getCurrentPosition() > movement.expectedClawLift && !isWithin(clawLift.getCurrentPosition(), movement.expectedClawLift, 10)) {
+                clawLift.setPower(0);
+                clawLift2.setPower(0);
+                clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                clawLift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                reverseSpool.setPower(movement.clawLiftPower * -0.85);
+                clawLift.setTargetPosition((int)movement.expectedClawLift);
+                reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            }
 
+            clawIntake.setTargetPosition((int)movement.expectedClawIntake);
+            clawIntake.setPower(movement.clawIntakePower);
 
             clawL.setPosition(movement.expectedClaw);
             clawR.setPosition(1 - movement.expectedClaw);
@@ -105,7 +128,14 @@ public class AutonBot extends BaseBot
             clawLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
-            if (movement.runtime != null && movement.runtime.time() > movement.moveTime) {
+            boolean inCorrectPos = isWithin(movement.expectedLf, leftFront.getCurrentPosition(), 20)
+                    && isWithin(movement.expectedRf, rightFront.getCurrentPosition(), 20)
+                    && isWithin(movement.expectedLb, leftBack.getCurrentPosition(), 20)
+                    && isWithin(movement.expectedRb, rightBack.getCurrentPosition(), 20)
+                    && isWithin(movement.expectedClawLift, clawLift.getCurrentPosition(), 20)
+                    && isWithin(movement.expectedClawIntake, clawIntake.getCurrentPosition(), 5);
+
+            if (movement.runtime != null && (movement.runtime.time() > movement.moveTime || inCorrectPos)) {
                 movement = null;
             }
         } else {
@@ -123,24 +153,24 @@ public class AutonBot extends BaseBot
      * - For move and strafe, distance is in inches <br/>
      * - For turn, distance is in degrees <br/>
      * - For delay, distance is not used <br/>
-     * - For claw, distance is either 1 for open or 0 for closed <br/>
-     * - For moveClaw, distance is 0 for ground, 1 for max height, -1 for short junction, -2 for medium junction, and -3 for tall junction (1900)          <br/>
-     * - For switch,
+     * - For claw, distance is either 0 for open or 1 for closed <br/>
+     * - For moveClaw, distance is 0 for ground, 1 for max height<br/>
+     * - For clawIntake, distance is 0 for ground, 1 for all the way up<br/>
      */
-    public void command(double time, double distance, String command, LinearOpMode opMode) {
+    public void command(double time, double distance, String command) {
         final ArrayList<String> commands = new ArrayList<>();
-        Collections.addAll(commands, "move", "turn", "strafe", "delay", "moveClaw", "claw");
+        Collections.addAll(commands, "move", "turn", "strafe", "delay", "moveClaw", "claw", "clawIntake");
         if (!commands.contains(command)) return;
-        movement = new Movement(command, time, distance, 0.4, this);
+        movement = new Movement(command, time, distance, 0.4);
         movement.init(this);
         while(movement != null) {
             move();
-
             opMode.telemetry.addData("enc counts per in", Constants.ENCODER_COUNTS_PER_IN);
-            opMode.telemetry.addData("lf Motor Encoder", leftFront.getCurrentPosition());
-            opMode.telemetry.addData("rf Motor Encoder", rightFront.getCurrentPosition());
-            opMode.telemetry.addData("lb Motor Encoder", leftBack.getCurrentPosition());
-            opMode.telemetry.addData("rb Motor Encoder", rightBack.getCurrentPosition());
+            //opMode.telemetry.addData("lf Motor Encoder", leftFront.getCurrentPosition());
+            //opMode.telemetry.addData("rf Motor Encoder", rightFront.getCurrentPosition());
+            //opMode.telemetry.addData("lb Motor Encoder", leftBack.getCurrentPosition());
+            //opMode.telemetry.addData("rb Motor Encoder", rightBack.getCurrentPosition());
+            opMode.telemetry.addData("claw intake pos", clawIntake.getCurrentPosition());
             if (movement != null && movement.runtime != null) {
                 opMode.telemetry.addData("encDistance", movement.encDistance);
                 opMode.telemetry.addData("lf Expected Pos", movement.expectedLf);
@@ -148,12 +178,14 @@ public class AutonBot extends BaseBot
                 opMode.telemetry.addData("lb Expected Pos", movement.expectedLb);
                 opMode.telemetry.addData("rb Expected Pos", movement.expectedRb);
                 opMode.telemetry.addData("claw lift Expected Pos", movement.expectedClawLift);
+                opMode.telemetry.addData("claw intake Expected Pos", movement.expectedClawIntake);
 
                 opMode.telemetry.addData("lf Power", movement.lfPower);
                 opMode.telemetry.addData("rf Power", movement.rfPower);
                 opMode.telemetry.addData("lb Power", movement.lbPower);
                 opMode.telemetry.addData("rb Power", movement.rbPower);
                 opMode.telemetry.addData("claw lift Power", movement.clawLiftPower);
+                opMode.telemetry.addData("claw intake Power", movement.clawIntakePower);
 
                 opMode.telemetry.addData("movement type", movement.type);
                 opMode.telemetry.addData("movement progress", movement.runtime.time());
@@ -164,5 +196,9 @@ public class AutonBot extends BaseBot
             }
             opMode.telemetry.update();
         }
+    }
+
+    private boolean isWithin(double a, double b, double distance) {
+        return Math.abs(a - b) <= distance;
     }
 }

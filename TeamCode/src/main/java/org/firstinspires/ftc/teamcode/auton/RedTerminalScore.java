@@ -35,8 +35,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "Color Detecting Auton", group = "Sensor")
-public class ColorDetectingAuton extends LinearOpMode {
+@Autonomous(name = "Red - Terminal Score", group = "2Terminal")
+public class RedTerminalScore extends LinearOpMode {
     OpenCvWebcam webcam;
     ElapsedTime runtime = new ElapsedTime();
     AutonBot robot = new AutonBot();
@@ -111,7 +111,7 @@ public class ColorDetectingAuton extends LinearOpMode {
         telemetry.addLine("Initing robot");
         telemetry.update();
 
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, this);
         telemetry.addLine("Waiting for start");
         telemetry.update();
 
@@ -170,16 +170,19 @@ public class ColorDetectingAuton extends LinearOpMode {
         telemetry.addData("Confidence", (int)((avgPixelColors[maxPixels] - avgPixelColors[nextPixels]) / avgPixelColors[maxPixels] * 100 * 100) / 100 + "%");
         telemetry.update();
 
-        robot.command(3, 80, "move", this);
+        robot.command(3, -19, "strafe");
+        robot.command(3, 16, "strafe");
+
+        robot.command(3, 26, "move");
 
         switch (maxPixels) {
             case 0:
                 //purple
-                robot.command(3, -40, "strafe", this);
+                robot.command(3, -24, "strafe");
                 break;
             case 2:
                 //orange
-                robot.command(3, 40, "strafe", this);
+                robot.command(3, 24, "strafe");
                 break;
         }
     }

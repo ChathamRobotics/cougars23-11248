@@ -19,6 +19,8 @@ public class AutonTest extends LinearOpMode
 {
     private final AutonBot robot = new AutonBot();
     private final ElapsedTime runtime = new ElapsedTime();
+    private double multi = 1;
+    private double lastMultiChange = 0;
 
     @Override
     public void runOpMode()
@@ -26,28 +28,29 @@ public class AutonTest extends LinearOpMode
         telemetry.addData(">", "Robot Ready");
         telemetry.update();
 
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, this);
 
         waitForStart();
 
-        robot.command(5, 75, "strafe", this);
-
         while(opModeIsActive())
         {
-            if (gamepad1.cross)
-            {
-                robot.command(3, 1, "claw", this);
+            if (gamepad1.cross) {
+                robot.command(3, 1, "moveClaw");
             }
-            if (gamepad1.triangle)
-            {
-                robot.command(3, 0, "claw", this);
-            }
-            if (gamepad1.square)
-            {
-                robot.command(5, 1, "moveClaw", this);
+            if (gamepad1.square) {
+                robot.command(3, 0, "moveClaw");
             }
             if (gamepad1.circle) {
-                robot.command(5, -90, "turn", this);
+                robot.command(3, 0, "clawIntake");
+            }
+            if (gamepad1.triangle) {
+                robot.command(3, 1, "clawIntake");
+            }
+            if (gamepad1.left_bumper) {
+                robot.command(1, 1, "claw");
+            }
+            if (gamepad1.right_bumper) {
+                robot.command(1, 0, "claw");
             }
         }
     }
