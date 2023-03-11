@@ -3,8 +3,7 @@ package org.firstinspires.ftc.teamcode.auton;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.AutonBot;
-import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.archive.AutonBot;
 
 @Autonomous(name = "Basic Auton", group = "Basic")
 public class BasicAuton extends LinearOpMode {

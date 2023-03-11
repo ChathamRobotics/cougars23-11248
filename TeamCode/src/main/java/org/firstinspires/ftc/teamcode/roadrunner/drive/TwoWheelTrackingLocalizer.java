@@ -52,9 +52,9 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     // Perpendicular is perpendicular to the forward axis
     private Encoder parallelEncoder, perpendicularEncoder;
 
-    private SampleMecanumDrive drive;
+    private BaseMecanumDrive drive;
 
-    public TwoWheelTrackingLocalizer(HardwareMap hardwareMap, SampleMecanumDrive drive) {
+    public TwoWheelTrackingLocalizer(HardwareMap hardwareMap, BaseMecanumDrive drive) {
         super(Arrays.asList(
                 new Pose2d(PARALLEL_X, PARALLEL_Y, 0),
                 new Pose2d(PERPENDICULAR_X, PERPENDICULAR_Y, Math.toRadians(90))
@@ -64,6 +64,7 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
         // Perpendicular -> 2 -> leftBack
         // Parallel -> 3 -> rightBack
+        // LParallel -> 0 ->
         parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightBack"));
         perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftBack"));
 

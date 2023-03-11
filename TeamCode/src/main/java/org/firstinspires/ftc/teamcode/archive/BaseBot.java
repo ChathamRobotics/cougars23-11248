@@ -27,8 +27,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.archive;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -80,7 +81,7 @@ public abstract class BaseBot
     public Servo        clawR               = null;
     public ColorSensor  colorSensorL        = null;
     public ColorSensor  colorSensorR        = null;
-    //public UltrasonicSensor ultrasonic      = null;
+    public ModernRoboticsI2cRangeSensor ultrasonic      = null;
 
 
     /**
@@ -102,7 +103,7 @@ public abstract class BaseBot
         clawR               = hwMap.get(Servo.class, "clawR");
 
 
-        //ultrasonic          = hwMap.get(UltrasonicSensor.class, "ultrasonic");
+        ultrasonic          = hwMap.get(ModernRoboticsI2cRangeSensor.class, "ultrasonic");
 
         //colorSensorL        = hwMap.get(ColorSensor.class, "colorSensorL");
         //colorSensorR        = hwMap.get(ColorSensor.class, "colorSensorR");

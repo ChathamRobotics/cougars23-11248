@@ -47,7 +47,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.4763; // in
     public static double GEAR_RATIO = 1d / 15.2; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 12.51; // in
+    public static double TRACK_WIDTH = 16.69; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -55,8 +55,8 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.0185; // 1.0 / rpmToVelocity(MAX_RPM);
-    public static double kA = 0.004;
+    public static double kV = 0.034; // 1.0 / rpmToVelocity(MAX_RPM);
+    public static double kA = 0.005;
     public static double kStatic = 0.02;
 
     /*
@@ -99,7 +99,7 @@ public class DriveConstants {
      * https://github.com/acmerobotics/road-runner-quickstart/issues/91
      
      */
-    public static double MAX_VEL = 30;
+    public static double MAX_VEL = 25;
     public static double MAX_ACCEL = 30;
     public static double MAX_ANG_VEL = Math.toRadians(286.4788975654116);
     public static double MAX_ANG_ACCEL = Math.toRadians(286.4788975654116);
@@ -117,4 +117,8 @@ public class DriveConstants {
       // see https://docs.google.com/document/d/1tyWrXDfMidwYyP_5H4mZyVgaEswhOC35gvdmP-V-5hA/edit#heading=h.61g9ixenznbx
       return 32767 / ticksPerSecond;
     }
+
+    // Constants for claw lift and claw intake. Adjust these if either system is changed.
+    public static final int CLAW_LIFT_MAX = 1300;
+    public static final int INTAKE_BOTTOM = -520;
 }

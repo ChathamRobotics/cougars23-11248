@@ -98,6 +98,7 @@ public class MotorTest extends LinearOpMode
             // Display the current motor name, encoder position, and power
             telemetry.addData("Motor", motorNames.get(motorIndex));
             telemetry.addData("Motor Position", currMotor.getCurrentPosition());
+            telemetry.addData("Motor Power", currMotor.getPower());
             telemetry.addData("Power", power);
             telemetry.update();
         }

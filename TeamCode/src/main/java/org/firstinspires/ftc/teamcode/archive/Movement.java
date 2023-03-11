@@ -1,9 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.archive;
 
 import static org.firstinspires.ftc.teamcode.Constants.CLAW_LIFT_MAX;
 import static org.firstinspires.ftc.teamcode.Constants.INTAKE_BOTTOM;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.Constants;
 
 public class Movement {
     public String type;

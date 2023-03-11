@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.TeleopBot;
+import org.firstinspires.ftc.teamcode.archive.TeleopBot;
 
 @TeleOp(name="Drive Test", group="Testing")
 public class DriveTest extends LinearOpMode
@@ -21,6 +21,8 @@ public class DriveTest extends LinearOpMode
         telemetry.update();
 
         robot.init(hardwareMap);
+        robot.clawL.scaleRange(0,1);
+        robot.clawR.scaleRange(0,1);
 
         waitForStart();
 
@@ -86,7 +88,9 @@ public class DriveTest extends LinearOpMode
 
             // Actually turn the motors
             robot.move();
-            robot.clawLift.setPower(gamepad2.left_stick_y * clawLiftPower);
+
+            robot.clawLift.setPower(gamepad2.left_stick_y * clawLiftPower * -1);
+            robot.clawLift2.setPower(gamepad2.left_stick_y * clawLiftPower * -1);
 
             // Display the current motor name, encoder position, and power
             telemetry.addData("Status", "Running");
