@@ -27,13 +27,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.archive;
+package org.firstinspires.ftc.teamcode.archive.auton;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.archive.BaseBot;
+import org.firstinspires.ftc.teamcode.archive.Movement;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.ArrayList;

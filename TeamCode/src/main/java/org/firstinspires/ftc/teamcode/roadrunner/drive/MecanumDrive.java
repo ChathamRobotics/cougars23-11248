@@ -19,8 +19,8 @@ public class MecanumDrive extends BaseMecanumDrive {
     private static final double CLAW_LIFT_MAX_VELOCITY = 1;
     private static final double CLAW_LIFT_ACCEL = 200;
 
-    private static final double CLAW_INTAKE_ERROR = 10;
-    private static final double CLAW_INTAKE_MAX_VELOCITY = 0.4;
+    private static final double CLAW_INTAKE_ERROR = 20;
+    private static final double CLAW_INTAKE_MAX_VELOCITY = 0.1;
     private static final double CLAW_INTAKE_ACCEL = 300;
 
     public DcMotorEx clawLift1, clawLift2;
@@ -89,7 +89,7 @@ public class MecanumDrive extends BaseMecanumDrive {
 
         if (waitToPos) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(200);
             } catch(InterruptedException e) {
                 System.out.println("got interrupted!");
             }
@@ -140,7 +140,10 @@ public class MecanumDrive extends BaseMecanumDrive {
                 // Go up -> clawLift
                 for (DcMotorEx motor : clawLift) {
                     motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-                    motor.setPower(PIDPower);
+                    //motor.setPower(PIDPower);
+                    motor.setTargetPosition((int)target);
+                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    motor.setPower(CLAW_LIFT_MAX_VELOCITY);
                 }
                 reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 reverseSpool.setPower(0);
@@ -151,10 +154,14 @@ public class MecanumDrive extends BaseMecanumDrive {
             else {
                 // Go down -> reverseSpool
                 reverseSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                reverseSpool.setPower(PIDPower);
+                reverseSpool.setPower(-PIDPower);
                 for (DcMotorEx motor : clawLift) {
                     motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-                    motor.setPower(0);
+                    if (clawLift1.getCurrentPosition() < 0) {
+                        motor.setPower(0.5);
+                    } else {
+                        motor.setPower(0);
+                    }
                 }
                 opMode.telemetry.addData("Running", "reverseSpool");
             }
@@ -175,11 +182,15 @@ public class MecanumDrive extends BaseMecanumDrive {
             opMode.telemetry.addData("Claw Intake Pos", clawIntake.getCurrentPosition());
             opMode.telemetry.addData("Claw Intake Target", target);
             double PIDPower = PIDPower(clawIntake.getCurrentPosition() - oldClawIntakePos, target - oldClawIntakePos, CLAW_INTAKE_MAX_VELOCITY, CLAW_INTAKE_ACCEL);
+            clawIntake.setTargetPosition((int)target);
             if (clawIntake.getCurrentPosition() < target) {
-                clawIntake.setPower(PIDPower);
+                //clawIntake.setPower(PIDPower);
+                clawIntake.setPower(CLAW_INTAKE_MAX_VELOCITY);
             } else {
-                clawIntake.setPower(-PIDPower);
+                //clawIntake.setPower(-PIDPower);
+                clawIntake.setPower(-CLAW_INTAKE_MAX_VELOCITY);
             }
+            clawIntake.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             opMode.telemetry.addData("PIDPower", PIDPower);
             opMode.telemetry.addData("Claw Intake Power", clawIntake.getPower());
             opMode.telemetry.addData("PIDPower 1", clawIntake.getCurrentPosition() - oldClawIntakePos);
@@ -187,5 +198,37 @@ public class MecanumDrive extends BaseMecanumDrive {
             opMode.telemetry.addData("math", Math.abs(clawIntake.getCurrentPosition() - target));
             opMode.telemetry.update();
         }
+    }
+
+
+    /**
+     * Quick function to score a cone on a tall junction
+     */
+    public void scoreConeOnTallJunction(LinearOpMode opMode) {
+        setClawPosition(1, false);
+        setClawIntakePosition(0.2, opMode);
+        setClawLiftPosition(1, opMode);
+        setClawIntakePosition(0.1, opMode);
+        setClawPosition(0, true);
+        setClawIntakePosition(0.3, opMode);
+        setClawLiftPosition(0, opMode);
+        setClawIntakePosition(0, opMode);
+    }
+
+
+    /**
+     * Quick function to grab a cone from stacks
+     */
+    public void getConeFromStacks(int coneHeight, LinearOpMode opMode) {
+        setClawPosition(0.5, false);
+        setClawIntakePosition(1 - 0.03 * coneHeight, opMode);
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            opMode.telemetry.addLine("Error");
+        }
+        setClawPosition(1, true);
+        setClawPosition(1, true);
+        setClawIntakePosition(0.2, opMode);
     }
 }

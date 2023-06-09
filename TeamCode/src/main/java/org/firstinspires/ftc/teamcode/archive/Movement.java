@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.Constants.INTAKE_BOTTOM;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.archive.auton.AutonBot;
 
 public class Movement {
     public String type;

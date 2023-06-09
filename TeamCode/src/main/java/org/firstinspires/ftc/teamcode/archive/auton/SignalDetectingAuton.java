@@ -27,18 +27,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.auton;
+package org.firstinspires.ftc.teamcode.archive.auton;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
+
+import org.checkerframework.checker.interning.qual.InternedDistinct;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.teamcode.archive.AutonBot;
+import org.firstinspires.ftc.teamcode.archive.auton.AutonBot;
 
 /**
  * This 2022-2023 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -50,7 +54,8 @@ import org.firstinspires.ftc.teamcode.archive.AutonBot;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-//@Autonomous(name = "Signal Detecting Auton", group = "Sensor")
+@Disabled
+@Autonomous(name = "Signal Detecting Auton", group = "Sensor")
 public class SignalDetectingAuton extends LinearOpMode {
 
     /*

@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.auton;
 
-import static org.firstinspires.ftc.teamcode.auton.AutonConstants.leftJunction;
+import static org.firstinspires.ftc.teamcode.auton.AutonConstants.rightJunction;
+import static org.firstinspires.ftc.teamcode.auton.AutonConstants.rightStacks;
+import static org.firstinspires.ftc.teamcode.auton.AutonConstants.rightZone1;
+import static org.firstinspires.ftc.teamcode.auton.AutonConstants.rightZone2;
+import static org.firstinspires.ftc.teamcode.auton.AutonConstants.rightZone3;
 import static org.firstinspires.ftc.teamcode.auton.AutonConstants.redLeftStart;
-import static org.firstinspires.ftc.teamcode.auton.AutonConstants.leftStacks;
-import static org.firstinspires.ftc.teamcode.auton.AutonConstants.leftZone1;
-import static org.firstinspires.ftc.teamcode.auton.AutonConstants.leftZone2;
-import static org.firstinspires.ftc.teamcode.auton.AutonConstants.leftZone3;
+import static org.firstinspires.ftc.teamcode.auton.AutonConstants.redRightStart;
+import static org.firstinspires.ftc.teamcode.auton.AutonConstants.rightJunction;
+import static org.firstinspires.ftc.teamcode.auton.AutonConstants.rightStacks;
 
 import android.util.Log;
 
@@ -23,9 +26,9 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name="Just Park", group="3")
+@Autonomous(name="Right Full Auton", group="1")
 
-public class JustPark extends LinearOpMode {
+public class RightFullAuton extends LinearOpMode {
 
     OpenCvWebcam webcam;
     ElapsedTime runtime = new ElapsedTime();
@@ -64,30 +67,41 @@ public class JustPark extends LinearOpMode {
 
         drive.setClawPosition(1, false);
 
-        drive.setPoseEstimate(redLeftStart);
+        drive.setPoseEstimate(redRightStart);
 
 
 
-        TrajectorySequence setup = drive.trajectorySequenceBuilder(new Pose2d(-33.1, -62.58, Math.toRadians(90.00)))
-                .lineToConstantHeading(new Vector2d(-35.20, -62.79))
-                .lineToConstantHeading(new Vector2d(-36.13, -5.87))
-                .lineToConstantHeading(new Vector2d(-35.69, -13.26))
+        TrajectorySequence setup = drive.trajectorySequenceBuilder(redRightStart)
+                .lineToConstantHeading(new Vector2d(35.20, -62.79))
+                .lineToConstantHeading(new Vector2d(36.13, -5.87))
+                .lineToConstantHeading(new Vector2d(36.13, -11.87))
+                .lineToLinearHeading(rightJunction)
                 .build();
 
-        TrajectorySequence parkZone1 = drive.trajectorySequenceBuilder(leftJunction)
-                .lineToLinearHeading(leftZone2)
-                .lineToLinearHeading(leftZone1)
+        TrajectorySequence toStacks = drive.trajectorySequenceBuilder(rightJunction)
+                .splineToLinearHeading(rightStacks, Math.toRadians(20))
+                .forward(3)
+                .build();
+
+        TrajectorySequence toJunction = drive.trajectorySequenceBuilder(rightStacks)
+                .splineToLinearHeading(rightJunction, Math.toRadians(20))
+                .build();
+
+
+        TrajectorySequence parkZone1 = drive.trajectorySequenceBuilder(rightJunction)
+                .lineToLinearHeading(rightZone2)
+                .lineToLinearHeading(rightZone1)
                 .strafeRight(3)
                 .build();
 
-        TrajectorySequence parkZone2 = drive.trajectorySequenceBuilder(leftJunction)
-                .lineToLinearHeading(leftZone2)
+        TrajectorySequence parkZone2 = drive.trajectorySequenceBuilder(rightJunction)
+                .lineToLinearHeading(rightZone2)
                 .strafeRight(3)
                 .build();
 
-        TrajectorySequence parkZone3 = drive.trajectorySequenceBuilder(leftJunction)
-                .lineToLinearHeading(leftZone2)
-                .lineToLinearHeading(leftZone3)
+        TrajectorySequence parkZone3 = drive.trajectorySequenceBuilder(rightJunction)
+                .lineToLinearHeading(rightZone2)
+                .lineToLinearHeading(rightZone3)
                 .strafeRight(3)
                 .build();
 
@@ -111,7 +125,7 @@ public class JustPark extends LinearOpMode {
         double totalOrangePixels = 0;
         double cycles = 0;
 
-        while (runtime.seconds() < 5) {
+        while (runtime.seconds() < 0.5) {
             telemetry.addData("Frame Count", webcam.getFrameCount());
             telemetry.addData("FPS", "%.2f", webcam.getFps());
             telemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
@@ -161,6 +175,11 @@ public class JustPark extends LinearOpMode {
 
         drive.setClawIntakePosition(0, this);
         drive.followTrajectorySequence(setup);
+        drive.scoreConeOnTallJunction(this);
+        drive.followTrajectorySequence(toStacks);
+        drive.getConeFromStacks(5, this);
+        drive.followTrajectorySequence(toJunction);
+        drive.scoreConeOnTallJunction(this);
 
         //
         //     Park

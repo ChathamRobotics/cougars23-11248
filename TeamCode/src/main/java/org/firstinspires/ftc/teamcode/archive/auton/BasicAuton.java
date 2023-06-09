@@ -1,10 +1,12 @@
-package org.firstinspires.ftc.teamcode.auton;
+package org.firstinspires.ftc.teamcode.archive.auton;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.archive.AutonBot;
+import org.firstinspires.ftc.teamcode.archive.auton.AutonBot;
 
+@Disabled
 @Autonomous(name = "Basic Auton", group = "Basic")
 public class BasicAuton extends LinearOpMode {
     AutonBot robot = new AutonBot();

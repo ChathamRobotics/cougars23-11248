@@ -19,24 +19,26 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.auton;
+package org.firstinspires.ftc.teamcode.archive.auton;
 
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.archive.AutonBot;
+import org.firstinspires.ftc.teamcode.auton.ColorDetectingPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "Blue - Terminal Score", group = "2Terminal")
-public class BlueTerminalScore extends LinearOpMode {
+@Disabled
+@Autonomous(name = "Left - Preload Tall", group = "3PreTall")
+public class LeftPreloadTall extends LinearOpMode {
     OpenCvWebcam webcam;
     ElapsedTime runtime = new ElapsedTime();
     AutonBot robot = new AutonBot();
@@ -112,6 +114,7 @@ public class BlueTerminalScore extends LinearOpMode {
         telemetry.update();
 
         robot.init(hardwareMap, this);
+        robot.command(1, 1, "claw");
         telemetry.addLine("Waiting for start");
         telemetry.update();
 
@@ -127,7 +130,7 @@ public class BlueTerminalScore extends LinearOpMode {
         double totalOrangePixels = 0;
         double cycles = 0;
 
-        while (runtime.seconds() < 5) {
+        while (runtime.seconds() < 1) {
             telemetry.addData("Frame Count", webcam.getFrameCount());
             telemetry.addData("FPS", "%.2f", webcam.getFps());
             telemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
@@ -170,10 +173,24 @@ public class BlueTerminalScore extends LinearOpMode {
         telemetry.addData("Confidence", (int)((avgPixelColors[maxPixels] - avgPixelColors[nextPixels]) / avgPixelColors[maxPixels] * 100 * 100) / 100 + "%");
         telemetry.update();
 
-        robot.command(3, 19, "strafe");
-        robot.command(3, -16, "strafe");
-
-        robot.command(3, 26, "move");
+        robot.command(0.5, -2, "strafe");
+        robot.command(4, 46, "move");
+        robot.command(1.5, -5, "strafe");
+        robot.command(1, 43, "turn");
+        robot.command(0.75, 5, "move");
+        robot.command(0.5, 0.5, "clawIntake");
+        robot.command(3, 1, "moveClaw");
+        robot.command(1, 0.8, "clawIntake");
+        robot.command(0.5, -2, "move");
+        robot.command(0.75, 0, "claw");
+        robot.command(0.25, 3, "move");
+        robot.command(0.5, 0.4, "clawIntake");
+        robot.command(4, 0, "moveClaw");
+        robot.command(0.5, 1, "clawIntake");
+        robot.command(0.75, -6, "move");
+        robot.command(1, -43, "turn");
+        robot.command(1.5, 5, "strafe");
+        robot.command(4, -20, "move");
 
         switch (maxPixels) {
             case 0:
@@ -185,6 +202,8 @@ public class BlueTerminalScore extends LinearOpMode {
                 robot.command(3, 24, "strafe");
                 break;
         }
+
+        robot.command(1, 3, "move");
     }
 }
 

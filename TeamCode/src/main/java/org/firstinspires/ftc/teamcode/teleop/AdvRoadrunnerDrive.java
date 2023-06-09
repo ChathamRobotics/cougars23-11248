@@ -178,13 +178,6 @@ public class AdvRoadrunnerDrive extends LinearOpMode {
                 clawIntake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
 
-            if (gamepad2.dpad_left) {
-                drive.setClawIntakePosition(0, this);
-            }
-            if (gamepad2.dpad_right) {
-                drive.setClawIntakePosition(1, this);
-            }
-
 
             drive.setWeightedDrivePower(
                     new Pose2d(
@@ -273,10 +266,10 @@ public class AdvRoadrunnerDrive extends LinearOpMode {
                 clawIntake.setPower(0);
             }
 
-            Pose2d poseEstimate = drive.getPoseEstimate();
-            telemetry.addData("x", poseEstimate.getX());
-            telemetry.addData("y", poseEstimate.getY());
-            telemetry.addData("heading", poseEstimate.getHeading());
+            //Pose2d poseEstimate = drive.getPoseEstimate();
+            //telemetry.addData("x", poseEstimate.getX());
+            //telemetry.addData("y", poseEstimate.getY());
+            //telemetry.addData("heading", poseEstimate.getHeading());
             telemetry.addData("Power", basePower);
             telemetry.addData("Claw Lift Power", clawLiftPower);
             telemetry.addData("ClawL Servo Position", clawL.getPosition());
@@ -294,7 +287,18 @@ public class AdvRoadrunnerDrive extends LinearOpMode {
 
             // Fix reverse spool
             if (gamepad1.triangle) {
+                reverseSpool.setPower(1);
+                reverseSpool.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            if (gamepad2.square) {
                 reverseSpool.setPower(-1);
+                reverseSpool.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                clawLift.setPower(0);
+                clawLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                clawLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                clawLift2.setPower(0);
+                clawLift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                clawLift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
         }
     }

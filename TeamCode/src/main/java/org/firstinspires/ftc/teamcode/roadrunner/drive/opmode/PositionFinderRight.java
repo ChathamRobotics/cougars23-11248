@@ -17,14 +17,14 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
 @TeleOp(group = "drive")
-public class PositionFinderLeft extends LinearOpMode {
+public class PositionFinderRight extends LinearOpMode {
     Encoder leftEncoder,rightEncoder,frontEncoder;
 
     @Override
     public void runOpMode() throws InterruptedException {
         BaseMecanumDrive drive = new BaseMecanumDrive(hardwareMap);
 
-        Pose2d redLeftStart = new Pose2d(-33.1, -62.58, Math.toRadians(90.00)); // From perspective of side, Red L, Blue R
+        Pose2d redLeftStart = new Pose2d(33.1, -62.58, Math.toRadians(90.00));
         drive.setPoseEstimate(redLeftStart);
 
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftFront"));

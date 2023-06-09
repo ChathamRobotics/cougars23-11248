@@ -23,9 +23,9 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name="Just Park", group="3")
+@Autonomous(name="Left Preload + Park", group="2")
 
-public class JustPark extends LinearOpMode {
+public class LeftPreloadPark extends LinearOpMode {
 
     OpenCvWebcam webcam;
     ElapsedTime runtime = new ElapsedTime();
@@ -71,8 +71,19 @@ public class JustPark extends LinearOpMode {
         TrajectorySequence setup = drive.trajectorySequenceBuilder(new Pose2d(-33.1, -62.58, Math.toRadians(90.00)))
                 .lineToConstantHeading(new Vector2d(-35.20, -62.79))
                 .lineToConstantHeading(new Vector2d(-36.13, -5.87))
-                .lineToConstantHeading(new Vector2d(-35.69, -13.26))
+                .lineToConstantHeading(new Vector2d(-36.13, -11.87))
+                .lineToLinearHeading(leftJunction)
                 .build();
+
+        TrajectorySequence toStacks = drive.trajectorySequenceBuilder(leftJunction)
+                .splineToLinearHeading(leftStacks, Math.toRadians(20))
+                .forward(3)
+                .build();
+
+        TrajectorySequence toJunction = drive.trajectorySequenceBuilder(leftStacks)
+                .splineToLinearHeading(leftJunction, Math.toRadians(20))
+                .build();
+
 
         TrajectorySequence parkZone1 = drive.trajectorySequenceBuilder(leftJunction)
                 .lineToLinearHeading(leftZone2)
@@ -111,7 +122,7 @@ public class JustPark extends LinearOpMode {
         double totalOrangePixels = 0;
         double cycles = 0;
 
-        while (runtime.seconds() < 5) {
+        while (runtime.seconds() < 1) {
             telemetry.addData("Frame Count", webcam.getFrameCount());
             telemetry.addData("FPS", "%.2f", webcam.getFps());
             telemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
@@ -156,11 +167,13 @@ public class JustPark extends LinearOpMode {
 
 
         //
-        //     Score preload & stacks
+        //     Score preload
         //
 
         drive.setClawIntakePosition(0, this);
         drive.followTrajectorySequence(setup);
+        drive.scoreConeOnTallJunction(this);
+
 
         //
         //     Park

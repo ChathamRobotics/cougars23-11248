@@ -19,24 +19,26 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.auton;
+package org.firstinspires.ftc.teamcode.archive.auton;
 
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.archive.AutonBot;
+import org.firstinspires.ftc.teamcode.auton.ColorDetectingPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "Red - Terminal Score", group = "2Terminal")
-public class RedTerminalScore extends LinearOpMode {
+@Disabled
+//@Autonomous(name = "Just Park", group = "1Both")
+public class JustPark extends LinearOpMode {
     OpenCvWebcam webcam;
     ElapsedTime runtime = new ElapsedTime();
     AutonBot robot = new AutonBot();
@@ -170,19 +172,16 @@ public class RedTerminalScore extends LinearOpMode {
         telemetry.addData("Confidence", (int)((avgPixelColors[maxPixels] - avgPixelColors[nextPixels]) / avgPixelColors[maxPixels] * 100 * 100) / 100 + "%");
         telemetry.update();
 
-        robot.command(3, -19, "strafe");
-        robot.command(3, 16, "strafe");
-
-        robot.command(3, 26, "move");
+        robot.command(3, 80, "move");
 
         switch (maxPixels) {
             case 0:
                 //purple
-                robot.command(3, -24, "strafe");
+                robot.command(3, -40, "strafe");
                 break;
             case 2:
                 //orange
-                robot.command(3, 24, "strafe");
+                robot.command(3, 40, "strafe");
                 break;
         }
     }

@@ -101,8 +101,8 @@ public class DriveConstants {
      */
     public static double MAX_VEL = 25;
     public static double MAX_ACCEL = 30;
-    public static double MAX_ANG_VEL = Math.toRadians(286.4788975654116);
-    public static double MAX_ANG_ACCEL = Math.toRadians(286.4788975654116);
+    public static double MAX_ANG_VEL = Math.toRadians(100);
+    public static double MAX_ANG_ACCEL = Math.toRadians(50);
 
 
     public static double encoderTicksToInches(double ticks) {
@@ -119,6 +119,6 @@ public class DriveConstants {
     }
 
     // Constants for claw lift and claw intake. Adjust these if either system is changed.
-    public static final int CLAW_LIFT_MAX = 1300;
+    public static final int CLAW_LIFT_MAX = 1650;
     public static final int INTAKE_BOTTOM = -520;
 }
